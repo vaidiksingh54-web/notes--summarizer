@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server Error (500) - CogniStudy AI</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+      </a>
+      <a href="dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+    </div>
+  </nav>
+
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+    <div class="glass-panel" style="max-width: 520px; width: 100%; padding: 48px 36px; text-align: center;">
+      <div style="font-size: 3.5rem; margin-bottom: 12px; font-weight: 800; color: var(--accent-rose);">500</div>
+      <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px;">Unexpected Server Error</h1>
+      <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 28px;">
+        An unexpected server error occurred while processing your study request. Please retry the operation or check API health.
+      </p>
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="window.location.reload()" class="btn btn-primary">Retry Request ↻</button>
+        <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+      </div>
+    </div>
+  </main>
+
+  <footer style="padding: 24px 0; border-top: 1px solid var(--border-subtle); font-size: 0.82rem; color: var(--text-faint); text-align: center;">
+    © 2026 CogniStudy AI • <a href="help.html" style="color: var(--text-muted);">Help Center</a>
+  </footer>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

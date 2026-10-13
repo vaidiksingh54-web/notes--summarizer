@@ -1,0 +1,21 @@
+$kind: http-request
+name: Generate Mind Map
+method: POST
+url: '{{baseUrl}}/api/mindmap/generate'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "topic": "Photosynthesis",
+      "depth": 2
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", () => pm.response.to.have.status(200));
+      pm.test("Has mindmap", () => pm.expect(pm.response.json().mindmap).to.be.an("object"));

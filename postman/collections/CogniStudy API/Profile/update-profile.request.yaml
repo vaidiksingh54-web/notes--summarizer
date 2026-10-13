@@ -1,0 +1,27 @@
+$kind: http-request
+name: Update Profile
+method: PUT
+url: '{{baseUrl}}/api/profile'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Test Student Updated",
+      "email": "{{testEmail}}",
+      "college": "City Engineering College",
+      "course": "Computer Science",
+      "phone": "9876543210",
+      "bio": "Updated bio for testing.",
+      "age": 20,
+      "avatar": "TS"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", () => pm.response.to.have.status(200));
+      pm.test("Name updated", () => pm.expect(pm.response.json().profile.name).to.eql("Test Student Updated"));

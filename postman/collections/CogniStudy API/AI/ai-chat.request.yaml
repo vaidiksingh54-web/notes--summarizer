@@ -1,0 +1,21 @@
+$kind: http-request
+name: AI Chat
+method: POST
+url: '{{baseUrl}}/api/ai/chat'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "message": "Explain photosynthesis in simple terms.",
+      "history": []
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", () => pm.response.to.have.status(200));
+      pm.test("Has reply", () => pm.expect(pm.response.json().reply).to.be.a("string"));

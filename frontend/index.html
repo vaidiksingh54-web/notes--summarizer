@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CogniStudy AI - Smart AI Study Assistant</title>
+  <meta name="description" content="Next-gen AI learning platform to turn lengthy notes into clear summaries, interactive flashcards, and self-testing quizzes.">
+  <meta property="og:title" content="CogniStudy AI - Smart AI Study Assistant">
+  <meta property="og:description" content="Next-gen AI learning platform to turn lengthy notes into clear summaries, interactive flashcards, and self-testing quizzes.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link active">Home</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="notes.html" class="nav-link">Summarizer</a></li>
+        <li><a href="mindmap.html" class="nav-link">Mind Map</a></li>
+        <li><a href="flashcards.html" class="nav-link">Flashcards</a></li>
+        <li><a href="quiz.html" class="nav-link">Quiz Generator</a></li>
+        <li><a href="help.html" class="nav-link">Help</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-secondary btn-sm">
+          <span>📊</span> Dashboard
+        </a>
+        <a href="login.html" class="btn btn-secondary btn-sm">
+          <span>↗</span> Sign In
+        </a>
+        <a href="notes.html" class="btn btn-primary btn-sm">
+          Start Summarizing ↗
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero-section" style="padding: 80px 0 60px; position: relative;">
+    <div class="container" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center;">
+      <div>
+        <div class="badge badge-cyan" style="margin-bottom: 24px; padding: 6px 14px;">
+          <span class="dot-indicator cyan"></span>
+          NEXT-GEN AI LEARNING ASSISTANT
+        </div>
+
+        <h1 style="font-size: 3.5rem; font-weight: 800; line-height: 1.15; margin-bottom: 24px;">
+          Turn lengthy notes into <span class="text-gradient">clear summaries & quizzes.</span>
+        </h1>
+
+        <p style="font-size: 1.15rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 36px; max-width: 580px;">
+          Make every study hour count. CogniStudy AI transforms dense academic lectures, readings, and textbooks into concise, structured insights and interactive self-testing quizzes.
+        </p>
+
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px;">
+          <a href="notes.html" class="btn btn-primary btn-lg">
+            Start Summarizing ↗
+          </a>
+          <a href="quiz.html" class="btn btn-secondary btn-lg">
+            Try Quiz Generator ✦
+          </a>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 24px; color: var(--text-faint); font-size: 0.85rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--accent-emerald);">✓</span> Server-side Gemini AI models
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--accent-emerald);">✓</span> Private student accounts
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--accent-emerald);">✓</span> 3D flashcards & revision tests
+          </div>
+        </div>
+      </div>
+
+      <div style="position: relative; padding: 20px 0;">
+        <div class="glass-card" style="padding: 24px; width: 92%; margin-left: auto; border-color: rgba(99, 102, 241, 0.25); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); transform: rotate(-2deg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 24px; height: 24px; border-radius: 6px; background: rgba(99, 102, 241, 0.2); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #a855f7;">≡</div>
+              <span style="font-weight: 600; font-size: 0.9rem; color: #fff;">Original Notes</span>
+            </div>
+            <span style="color: var(--text-faint); font-size: 0.8rem;">•••</span>
+          </div>
+          
+          <div style="height: 8px; width: 90%; background: rgba(255, 255, 255, 0.15); border-radius: 4px; margin-bottom: 10px;"></div>
+          <div style="height: 8px; width: 75%; background: rgba(255, 255, 255, 0.1); border-radius: 4px; margin-bottom: 10px;"></div>
+          <div style="height: 8px; width: 85%; background: rgba(255, 255, 255, 0.1); border-radius: 4px; margin-bottom: 16px;"></div>
+
+          <div style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 600; letter-spacing: 0.05em;">
+            BIOLOGY • CHAPTER 04
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin: 12px 0;">
+          <div style="height: 1px; width: 50px; background: linear-gradient(90deg, transparent, var(--accent-cyan));"></div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--accent-cyan); letter-spacing: 0.1em; text-transform: uppercase;">AI PROCESSING</span>
+          <div style="height: 1px; width: 50px; background: linear-gradient(90deg, var(--accent-cyan), transparent);"></div>
+        </div>
+
+        <div class="glass-card" style="padding: 24px; width: 95%; margin: 0 auto; border-color: rgba(56, 189, 248, 0.35); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6); transform: rotate(1.5deg);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--accent-cyan); font-size: 14px;">✦</span>
+              <span style="font-weight: 700; font-size: 0.92rem; color: #fff;">Smart Summary & Quiz</span>
+              <span style="color: var(--accent-purple); font-size: 14px;">✦</span>
+            </div>
+            <span class="badge badge-emerald" style="font-size: 0.68rem; padding: 2px 8px;">ACTIVE</span>
+          </div>
+
+          <div style="height: 5px; width: 100%; background: rgba(255, 255, 255, 0.08); border-radius: 99px; margin-bottom: 14px; overflow: hidden;">
+            <div style="height: 100%; width: 78%; background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc); border-radius: 99px;"></div>
+          </div>
+
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+            Photosynthesis converts photon energy into chemical ATP and NADPH inside thylakoid membranes, followed by Calvin cycle glucose synthesis...
+          </p>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="badge badge-cyan" style="font-size: 0.7rem;">Key insight</span>
+            <span class="badge badge-purple" style="font-size: 0.7rem;">Quiz Ready</span>
+            <span class="badge badge-emerald" style="font-size: 0.7rem;">3 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Live Summarizer Demo Section -->
+  <section style="padding: 70px 0; border-top: 1px solid var(--border-subtle); position: relative;">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 12px;">
+          Summarize with <span class="text-gradient">CogniStudy AI.</span>
+        </h2>
+        <p style="font-size: 1.05rem; color: var(--text-muted);">
+          Try the interactive preview below. Sign in to save summaries to your personal account.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch;">
+        <div class="glass-panel" style="padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-faint); letter-spacing: 0.08em;">01 / INPUT</span>
+              <span class="badge badge-emerald">
+                <span class="dot-indicator emerald"></span> Ready
+              </span>
+            </div>
+            
+            <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 16px;">Your Notes</h3>
+
+            <textarea id="demo-notes-input" class="glass-textarea" rows="7" placeholder="Paste your study notes here or click 'Load Demo Notes' to see CogniStudy AI in action..."></textarea>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; margin-bottom: 16px;">
+              <span id="demo-char-count" style="font-size: 0.78rem; color: var(--text-faint);">0 / 12,000 characters</span>
+              <button id="btn-demo-load-notes" class="btn btn-ghost btn-sm" style="color: var(--accent-cyan); font-weight: 600;">
+                Load Demo Notes ↗
+              </button>
+            </div>
+
+            <div class="dropzone" id="demo-dropzone" style="padding: 18px;">
+              <div class="dropzone-icon" style="width: 36px; height: 36px; margin-bottom: 8px;">↑</div>
+              <div style="font-weight: 600; font-size: 0.9rem; color: #fff;">Drag & drop a file or browse</div>
+              <div style="font-size: 0.78rem; color: var(--text-faint); margin-top: 4px;">Supports text notes and lecture transcripts</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; gap: 12px;">
+            <button id="btn-demo-generate" class="btn btn-primary btn-full">
+              Generate AI Summary ✦
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 28px; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-faint); letter-spacing: 0.08em;">02 / OUTPUT</span>
+            <span class="badge badge-cyan">✦ DEMO</span>
+          </div>
+
+          <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 16px;">AI Summary</h3>
+
+          <div id="demo-output-empty" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--accent-cyan); font-size: 1.3rem;">
+              ✦
+            </div>
+            <h4 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 8px;">Your generated summary will appear here.</h4>
+            <p style="font-size: 0.88rem; color: var(--text-faint); max-width: 360px;">
+              Paste some notes and click <strong>Generate AI Summary</strong> to view the structured takeaways.
+            </p>
+          </div>
+
+          <div id="demo-output-result" style="display: none; flex: 1; overflow-y: auto; max-height: 380px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-purple">Structured Output</span>
+              <a href="notes.html" class="btn btn-secondary btn-sm">Open in Editor ↗</a>
+            </div>
+            <div id="demo-result-body" style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" style="padding: 80px 0; border-top: 1px solid var(--border-subtle);">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 56px;">
+        <span class="badge badge-purple" style="margin-bottom: 12px;">Features</span>
+        <h2 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 14px;">Engineered for High-Performance Students</h2>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Everything you need to master your syllabus in half the time.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+        <a href="notes.html" class="glass-card" style="padding: 28px; text-decoration: none;">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(56, 189, 248, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px;">
+            📝
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #fff;">AI Notes Generator</h3>
+          <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            Paste text or upload lecture documents to generate organized, comprehensive notes with key formulas and concepts.
+          </p>
+          <span style="color: var(--accent-cyan); font-weight: 600; font-size: 0.88rem;">Try Notes Generator ↗</span>
+        </a>
+
+        <a href="flashcards.html" class="glass-card" style="padding: 28px; text-decoration: none;">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(168, 85, 247, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px;">
+            🃏
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #fff;">AI Flashcard Generator</h3>
+          <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            Automatically extract question-answer pairs with 3D flip card interactions and active recall tracking.
+          </p>
+          <span style="color: var(--accent-purple); font-weight: 600; font-size: 0.88rem;">Study Flashcards ↗</span>
+        </a>
+
+        <a href="quiz.html" class="glass-card" style="padding: 28px; text-decoration: none;">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px;">
+            🧠
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #fff;">AI Quiz Generator</h3>
+          <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            Test your comprehension with dynamic multiple-choice quizzes, instant explanations, and scoring breakdowns.
+          </p>
+          <span style="color: var(--accent-emerald); font-weight: 600; font-size: 0.88rem;">Take a Quiz ↗</span>
+        </a>
+
+        <div class="glass-card" style="padding: 28px;">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px;">
+            ✨
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #fff;">Smart AI Transformations</h3>
+          <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            Shorten notes for quick revision, expand technical explanations, simplify complex theories (ELI5), or format into bullets.
+          </p>
+          <span class="badge badge-amber">6 Built-in Tools</span>
+        </div>
+
+        <a href="library.html" class="glass-card" style="padding: 28px; text-decoration: none;">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(99, 102, 241, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px;">
+            📚
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #fff;">Central Study Library</h3>
+          <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            Organize all your notes, flashcards, and quizzes in one searchable hub with tags, favorites, and 3-dot management menus.
+          </p>
+          <span style="color: #818cf8; font-weight: 600; font-size: 0.88rem;">Open Library ↗</span>
+        </a>
+
+        <a href="dashboard.html" class="glass-card" style="padding: 28px; text-decoration: none;">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(244, 63, 94, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px;">
+            📅
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #fff;">Google Calendar Study Planner</h3>
+          <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            Schedule focus blocks directly into your Google Calendar for spaced repetition and exam review.
+          </p>
+          <span style="color: #fb7185; font-weight: 600; font-size: 0.88rem;">Explore Planner ↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Timeline -->
+  <section id="how-it-works" style="padding: 80px 0; border-top: 1px solid var(--border-subtle);">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 56px;">
+        <span class="badge badge-cyan" style="margin-bottom: 12px;">Simple Workflow</span>
+        <h2 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 14px;">How It Works</h2>
+        <p style="color: var(--text-muted);">From raw lecture material to exam-ready confidence in four steps.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+        <div class="glass-card" style="padding: 24px; text-align: center;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); font-weight: 800; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">1</div>
+          <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Upload or Paste</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">Paste lecture transcripts, textbook chapters, or drop file documents.</p>
+        </div>
+
+        <div class="glass-card" style="padding: 24px; text-align: center;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); color: #818cf8; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">2</div>
+          <h4 style="font-size: 1.1rem; margin-bottom: 8px;">AI Processing</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">The server-side model extracts core theorems, formulas, and definitions.</p>
+        </div>
+
+        <div class="glass-card" style="padding: 24px; text-align: center;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); font-weight: 800; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">3</div>
+          <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Generate Content</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">Receive structured notes, interactive 3D flashcards, and test quizzes.</p>
+        </div>
+
+        <div class="glass-card" style="padding: 24px; text-align: center;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); font-weight: 800; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">4</div>
+          <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Learn & Revise</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">Practice active recall, check score reports, and schedule calendar sessions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Accordion -->
+  <section id="faq" style="padding: 80px 0; border-top: 1px solid var(--border-subtle);">
+    <div class="container" style="max-width: 860px;">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <span class="badge badge-purple" style="margin-bottom: 12px;">Got Questions?</span>
+        <h2 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 14px;">Frequently Asked Questions</h2>
+        <p style="color: var(--text-muted);">Everything you need to know about CogniStudy AI.</p>
+      </div>
+
+      <div class="accordion-item open">
+        <div class="accordion-header">
+          <span>How does the AI Notes Generator work?</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          The generator parses study text or lecture notes into structured sections: an Executive Overview, Key Core Concepts, Essential Terminology, and an Exam Memory Checklist. You can then use the built-in rich text editor and AI Tools (Shorten, Expand, Simplify) to tailor the output.
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <span>Can I generate flashcards and quizzes directly from my notes?</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          Yes. From any generated note, click "Convert to Flashcards" or "Convert to Quiz" to create interactive 3D flip flashcards and multiple-choice practice tests with one click.
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <span>Where are student accounts and data stored?</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          During development, data is stored in a clean server repository service in memory per student account. When you connect a database to the backend repository interface, data will persist permanently.
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <span>Can I sync study sessions with Google Calendar?</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          Yes! The study assistant includes a one-click Google Calendar integration that creates pre-filled revision focus blocks with your study topics and summaries.
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <span>How are AI calls securely executed?</span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          All calls to Gemini models happen on the server via authenticated API proxy routes. Your GEMINI_API_KEY is never sent to the browser or bundled in frontend client assets.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section style="padding: 80px 0; border-top: 1px solid var(--border-subtle); text-align: center; position: relative;">
+    <div class="container" style="max-width: 680px;">
+      <h2 style="font-size: 2.6rem; font-weight: 800; margin-bottom: 16px;">
+        Ready to study <span class="text-gradient">smarter?</span>
+      </h2>
+      <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 32px;">
+        Turn hours of lecture reading into instant mastery. Explore the full student dashboard or start summarizing right now.
+      </p>
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="notes.html" class="btn btn-primary btn-lg">Get Started Free ↗</a>
+        <a href="dashboard.html" class="btn btn-secondary btn-lg">Explore Dashboard 📊</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer with Legal & Support links -->
+  <footer style="padding: 50px 0 30px; border-top: 1px solid var(--border-subtle); font-size: 0.88rem; color: var(--text-faint);">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="brand-icon-wrapper" style="width: 28px; height: 28px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <span style="font-weight: 700; color: #fff;">CogniStudy AI</span>
+        <span>• Student Edition</span>
+      </div>
+
+      <div style="display: flex; gap: 18px; flex-wrap: wrap;">
+        <a href="dashboard.html" style="color: var(--text-muted);">Dashboard</a>
+        <a href="notes.html" style="color: var(--text-muted);">Notes</a>
+        <a href="flashcards.html" style="color: var(--text-muted);">Flashcards</a>
+        <a href="quiz.html" style="color: var(--text-muted);">Quiz</a>
+        <a href="library.html" style="color: var(--text-muted);">Library</a>
+        <a href="help.html" style="color: var(--text-muted);">Help Center</a>
+      </div>
+
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.82rem;">
+        <a href="privacy.html" style="color: var(--text-faint);">Privacy Policy</a>
+        <a href="terms.html" style="color: var(--text-faint);">Terms of Service</a>
+        <a href="cookies.html" style="color: var(--text-faint);">Cookie Notice</a>
+        <a href="accessibility.html" style="color: var(--text-faint);">Accessibility</a>
+        <a href="disclaimer.html" style="color: var(--text-faint);">Academic Disclaimer</a>
+      </div>
+    </div>
+    <div class="container" style="margin-top: 18px; text-align: center; font-size: 0.78rem; color: var(--text-faint);">
+      © 2026 CogniStudy AI. Built for Academic and Higher Education Productivity.
+    </div>
+  </footer>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const demoInput = document.getElementById("demo-notes-input");
+      const demoChar = document.getElementById("demo-char-count");
+      const demoLoadBtn = document.getElementById("btn-demo-load-notes");
+      const demoGenBtn = document.getElementById("btn-demo-generate");
+      const demoDropzone = document.getElementById("demo-dropzone");
+      const demoEmpty = document.getElementById("demo-output-empty");
+      const demoResult = document.getElementById("demo-output-result");
+      const demoBody = document.getElementById("demo-result-body");
+
+      const SAMPLE_TEXT = `Photosynthesis converts photon energy into stable chemical bonds. In the thylakoid membranes, photolysis of water releases O2 and protons while ATP and NADPH are synthesized. Inside the stroma, RuBisCO catalyzes carbon fixation in the Calvin cycle to produce glucose.`;
+
+      demoInput?.addEventListener("input", () => {
+        demoChar.textContent = `${demoInput.value.length.toLocaleString()} / 12,000 characters`;
+      });
+
+      demoLoadBtn?.addEventListener("click", () => {
+        demoInput.value = SAMPLE_TEXT;
+        demoInput.dispatchEvent(new Event("input"));
+        window.showToast("Loaded sample notes!", "info");
+      });
+
+      demoDropzone?.addEventListener("click", () => {
+        demoInput.value = SAMPLE_TEXT;
+        demoInput.dispatchEvent(new Event("input"));
+        window.showToast("Loaded file preview notes!", "info");
+      });
+
+      demoGenBtn?.addEventListener("click", () => {
+        const val = demoInput.value.trim();
+        if (!val) {
+          window.showToast("Please enter notes or click 'Load Demo Notes' first.", "error");
+          return;
+        }
+
+        demoGenBtn.disabled = true;
+        demoGenBtn.innerHTML = `<span>⏳</span> Generating...`;
+
+        setTimeout(() => {
+          demoEmpty.style.display = "none";
+          demoResult.style.display = "block";
+          demoBody.innerHTML = `
+            <h4 style="color: #38bdf8; font-weight: 700; margin-bottom: 8px;">Key Takeaways:</h4>
+            <ul style="padding-left: 20px; margin-bottom: 12px;">
+              <li><strong>Energy Conversion:</strong> Photons are converted into ATP and NADPH in the thylakoids.</li>
+              <li><strong>Photolysis:</strong> Water molecules are cleaved into H+ and oxygen gas (O2).</li>
+              <li><strong>Carbon Fixation:</strong> RuBisCO catalyzes CO2 incorporation into sugars via the Calvin cycle.</li>
+            </ul>
+            <div style="background: rgba(99, 102, 241, 0.1); border-left: 3px solid #6366f1; padding: 10px; border-radius: 6px; font-size: 0.85rem;">
+              💡 <strong>Exam Formula:</strong> 6 CO2 + 6 H2O + Light → C6H12O6 + 6 O2.
+            </div>
+          `;
+          demoGenBtn.disabled = false;
+          demoGenBtn.innerHTML = `Generate AI Summary ✦`;
+          window.showToast("Generated preview summary!", "success");
+        }, 800);
+      });
+
+      document.querySelectorAll(".accordion-header").forEach(header => {
+        header.addEventListener("click", () => {
+          const item = header.parentElement;
+          item.classList.toggle("open");
+        });
+      });
+    });
+  </script>
+</body>
+</html>

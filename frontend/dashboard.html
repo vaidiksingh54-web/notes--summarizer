@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - CogniStudy AI</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <!-- Reusable App Navbar -->
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="mobile-sidebar-toggle" class="mobile-menu-toggle" aria-label="Toggle Navigation">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+        </a>
+      </div>
+
+      <!-- Center Links -->
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+        
+        <!-- Revision Dropdown -->
+        <li class="nav-dropdown">
+          <a href="#" class="nav-link" data-dropdown-toggle="dropdown-revision">
+            Revision <span style="font-size: 10px;">▼</span>
+          </a>
+          <div id="dropdown-revision" class="dropdown-menu">
+            <a href="mindmap.html" class="dropdown-item"><span>🕸</span> AI Mind Map</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> Active Recall Flashcards</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> Comprehensive Quiz</a>
+            <div class="dropdown-divider"></div>
+            <a href="library.html?filter=favorites" class="dropdown-item"><span>⭐</span> Starred High-Priority</a>
+          </div>
+        </li>
+
+        <li><a href="notes.html" class="nav-link">AI Notes</a></li>
+        <li><a href="mindmap.html" class="nav-link">Mind Map</a></li>
+        <li><a href="flashcards.html" class="nav-link">AI Flashcards</a></li>
+        <li><a href="quiz.html" class="nav-link">AI Quiz</a></li>
+
+        <!-- More Dropdown -->
+        <li class="nav-dropdown">
+          <a href="#" class="nav-link" data-dropdown-toggle="dropdown-more">
+            More <span style="font-size: 10px;">▼</span>
+          </a>
+          <div id="dropdown-more" class="dropdown-menu">
+            <a href="library.html" class="dropdown-item"><span>📚</span> Full Study Library</a>
+            <a href="profile.html" class="dropdown-item"><span>👤</span> Student Profile</a>
+            <a href="help.html" class="dropdown-item"><span>❓</span> Help & Documentation</a>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Right Actions -->
+      <div class="nav-actions">
+        <div class="nav-dropdown">
+          <button id="btn-create-nav" class="btn btn-primary btn-sm">
+            <span style="font-size: 14px; font-weight: 700;">+</span> Create
+          </button>
+          <div id="dropdown-create-menu" class="dropdown-menu right-aligned">
+            <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-faint); padding: 4px 12px; letter-spacing: 0.08em;">CREATE NEW</div>
+            <a href="notes.html" class="dropdown-item"><span>✨</span> AI Notes Generator</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> AI Flashcard Deck</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> Self-Testing Quiz</a>
+            <div class="dropdown-divider"></div>
+            <a href="notes.html?mode=doc" class="dropdown-item"><span>📄</span> Upload Document</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <button id="btn-notification" class="nav-icon-btn" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="nav-badge"></span>
+          </button>
+          <div id="panel-notification" class="dropdown-menu right-aligned" style="width: 320px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">Notifications</span>
+              <button id="btn-mark-all-read" class="btn btn-ghost btn-sm" style="font-size: 0.75rem; color: var(--accent-cyan); padding: 2px 6px;">
+                Mark all as read
+              </button>
+            </div>
+            <div id="notification-list"></div>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div id="btn-avatar-nav" class="avatar-btn">
+            <div class="avatar-img user-avatar-display">ST</div>
+            <span class="user-name-display" style="font-size: 0.88rem; font-weight: 500; color: #fff; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Student</span>
+            <span style="font-size: 10px; color: var(--text-faint);">▼</span>
+          </div>
+          <div id="dropdown-profile-menu" class="dropdown-menu right-aligned">
+            <div style="padding: 8px 12px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 6px;">
+              <div class="user-name-display" style="font-weight: 600; color: #fff; font-size: 0.9rem;">Student</div>
+              <div class="user-email-display" style="font-size: 0.78rem; color: var(--text-faint);">student@college.edu</div>
+            </div>
+            <a href="profile.html" class="dropdown-item"><span>👤</span> Profile Settings</a>
+            <a href="library.html" class="dropdown-item"><span>📚</span> My Library</a>
+            <a href="help.html" class="dropdown-item"><span>❓</span> Help & Support</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" id="btn-logout" class="dropdown-item" style="color: #fb7185;"><span>🚪</span> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-heading">STUDY TOOLS</div>
+        <a href="dashboard.html" class="sidebar-item active">
+          <span>🏠</span> Dashboard
+        </a>
+        <a href="library.html" class="sidebar-item">
+          <span>📚</span> My Library
+        </a>
+        <a href="notes.html" class="sidebar-item">
+          <span>📝</span> AI Notes
+        </a>
+        <a href="flashcards.html" class="sidebar-item">
+          <span>🃏</span> Flashcards
+        </a>
+        <a href="quiz.html" class="sidebar-item">
+          <span>🧠</span> Quizzes
+        </a>
+        <a href="library.html?filter=favorites" class="sidebar-item">
+          <span>⭐</span> Favorites
+        </a>
+
+        <div class="sidebar-heading">ACCOUNT & SUPPORT</div>
+        <a href="profile.html" class="sidebar-item">
+          <span>⚙</span> Settings & Profile
+        </a>
+        <a href="help.html" class="sidebar-item">
+          <span>❓</span> Help & FAQ
+        </a>
+      </div>
+
+      <div class="glass-card" style="padding: 14px; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 6px;">
+          <span style="color: var(--text-faint);">Session Storage</span>
+          <span style="color: var(--accent-cyan); font-weight: 600;">Active</span>
+        </div>
+        <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden;">
+          <div style="height: 100%; width: 65%; background: var(--accent-cyan); border-radius: 99px;"></div>
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-faint); margin-top: 6px;">Connected to server API</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 6px;">
+            Good morning, <span class="user-name-display text-gradient">Student</span> 👋
+          </h1>
+          <p style="color: var(--text-muted); font-size: 1.05rem;">
+            Continue your learning journey. You're making steady revision progress this week.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button id="btn-sync-study-calendar" class="btn btn-secondary">
+            <span>📅</span> Add Study Block to Google Calendar
+          </button>
+          <a href="notes.html" class="btn btn-primary">
+            <span>✨</span> New Notes
+          </a>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 36px;">
+        <div class="glass-card" style="padding: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.85rem; color: var(--text-faint); font-weight: 600;">TOTAL NOTES</span>
+            <span style="font-size: 1.3rem;">📝</span>
+          </div>
+          <div id="stat-notes-count" style="font-size: 2.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">0</div>
+          <div style="font-size: 0.8rem; color: var(--accent-emerald);">Saved in your study vault</div>
+        </div>
+
+        <div class="glass-card" style="padding: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.85rem; color: var(--text-faint); font-weight: 600;">FLASHCARDS</span>
+            <span style="font-size: 1.3rem;">🃏</span>
+          </div>
+          <div id="stat-flashcards-count" style="font-size: 2.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">0</div>
+          <div style="font-size: 0.8rem; color: var(--accent-purple);">Active recall decks</div>
+        </div>
+
+        <div class="glass-card" style="padding: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.85rem; color: var(--text-faint); font-weight: 600;">QUIZZES ATTEMPTED</span>
+            <span style="font-size: 1.3rem;">🧠</span>
+          </div>
+          <div id="stat-quizzes-count" style="font-size: 2.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">0</div>
+          <div style="font-size: 0.8rem; color: var(--accent-cyan);">Practice test evaluations</div>
+        </div>
+
+        <div class="glass-card" style="padding: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.85rem; color: var(--text-faint); font-weight: 600;">STUDY PROGRESS</span>
+            <span style="font-size: 1.3rem;">🔥</span>
+          </div>
+          <div id="stat-progress-pct" style="font-size: 2.1rem; font-weight: 800; color: #fff; margin-bottom: 8px;">0%</div>
+          <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden;">
+            <div style="height: 100%; width: 10%; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 99px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 40px;">
+        <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 18px; color: #fff;">Quick Actions</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
+          <a href="notes.html" class="glass-card" style="padding: 24px; text-decoration: none; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(56, 189, 248, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+              📝
+            </div>
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">Generate Notes</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Transform lecture text</div>
+            </div>
+          </a>
+
+          <a href="flashcards.html" class="glass-card" style="padding: 24px; text-decoration: none; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(168, 85, 247, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+              🃏
+            </div>
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">Create Flashcards</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Active recall drills</div>
+            </div>
+          </a>
+
+          <a href="quiz.html" class="glass-card" style="padding: 24px; text-decoration: none; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+              🧠
+            </div>
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">Generate Quiz</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Comprehension test</div>
+            </div>
+          </a>
+
+          <a href="library.html" class="glass-card" style="padding: 24px; text-decoration: none; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(99, 102, 241, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+              📚
+            </div>
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">My Library</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">View all saved materials</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+          <h2 style="font-size: 1.35rem; font-weight: 700; color: #fff;">Recent Activity</h2>
+          <a href="library.html" class="btn btn-ghost btn-sm" style="color: var(--accent-cyan);">View All in Library →</a>
+        </div>
+
+        <div id="dashboard-recent-list"></div>
+      </div>
+    </main>
+  </div>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

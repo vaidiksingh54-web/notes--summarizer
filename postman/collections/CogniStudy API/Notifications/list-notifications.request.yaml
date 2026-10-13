@@ -1,0 +1,11 @@
+$kind: http-request
+name: List Notifications
+method: GET
+url: '{{baseUrl}}/api/notifications'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", () => pm.response.to.have.status(200));
+      pm.test("Has notifications array", () => pm.expect(pm.response.json().notifications).to.be.an("array"));

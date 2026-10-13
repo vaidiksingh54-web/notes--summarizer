@@ -1,0 +1,402 @@
+/**
+ * CogniStudy AI - AI Notes Generator & Interactive Editor
+ */
+
+document.addEventListener("DOMContentLoaded", async () => {
+  initNotesGenerator();
+  initNotesEditor();
+  await window.store.ready;
+  checkUrlParamsForEdit();
+});
+
+const DEMO_ACADEMIC_NOTES = `Photosynthesis & Cellular Energy Transduction
+
+Photosynthesis is the fundamental biological process by which autotrophic organisms (plants, algae, and cyanobacteria) convert solar photons into chemical energy stored within covalent bonds of carbohydrates.
+
+1. Light-Dependent Reactions (Thylakoid Membrane):
+Photons strike photosystem II (P680), photoexciting electrons that journey along the electron transport chain (ETC). Water photolysis generates molecular oxygen (O2) and protons. Chemiosmotic ATP synthase uses the proton gradient to generate ATP, alongside NADPH formation via photosystem I (P700).
+
+2. Light-Independent Reactions (Calvin Cycle - Stroma):
+Carbon fixation is catalyzed by Ribulose-1,5-bisphosphate carboxylase-oxygenase (RuBisCO), incorporating atmospheric CO2 into 3-phosphoglycerate (3-PGA). Subsequent reduction and RuBP regeneration cycles synthesize glucose (C6H12O6).
+
+Key Equation:
+6 CO2 + 6 H2O + Light Energy -> C6H12O6 + 6 O2
+
+Cellular Respiration Coupling:
+The resulting carbohydrates undergo glycolysis, the Krebs cycle, and oxidative phosphorylation in the mitochondria to produce approximately 30-32 net ATP molecules per glucose molecule.`;
+
+function initNotesGenerator() {
+  const notesTextarea = document.getElementById("notes-source-input");
+  const charCounter = document.getElementById("char-count");
+  const loadDemoBtn = document.getElementById("btn-load-demo-notes");
+  const clearBtn = document.getElementById("btn-clear-notes");
+  const generateBtn = document.getElementById("btn-generate-notes");
+  const fileInput = document.getElementById("doc-file-input");
+  const dropzone = document.getElementById("file-dropzone");
+  const filePreview = document.getElementById("file-preview");
+
+  if (!notesTextarea) return;
+
+  notesTextarea.addEventListener("input", () => {
+    const len = notesTextarea.value.length;
+    if (charCounter) charCounter.textContent = `${len.toLocaleString()} / 25,000 characters`;
+  });
+
+  if (loadDemoBtn) {
+    loadDemoBtn.addEventListener("click", () => {
+      notesTextarea.value = DEMO_ACADEMIC_NOTES;
+      notesTextarea.dispatchEvent(new Event("input"));
+      window.showToast("Loaded academic sample notes!", "info");
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      notesTextarea.value = "";
+      notesTextarea.dispatchEvent(new Event("input"));
+      if (filePreview) filePreview.style.display = "none";
+      window.showToast("Cleared inputs", "info");
+    });
+  }
+
+  if (dropzone && fileInput) {
+    dropzone.addEventListener("click", () => fileInput.click());
+    
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      if (e.dataTransfer.files.length > 0) {
+        handleSelectedFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        handleSelectedFile(e.target.files[0]);
+      }
+    });
+  }
+
+  function handleSelectedFile(file) {
+    if (filePreview) {
+      document.getElementById("preview-file-name").textContent = file.name;
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      document.getElementById("preview-file-size").textContent = `${sizeMb} MB`;
+      filePreview.style.display = "flex";
+    }
+
+    if (file.type.includes("text") || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        notesTextarea.value = e.target.result;
+        notesTextarea.dispatchEvent(new Event("input"));
+      };
+      reader.readAsText(file);
+    } else {
+      notesTextarea.value = `[Extracted from ${file.name}]\n\n` + DEMO_ACADEMIC_NOTES;
+      notesTextarea.dispatchEvent(new Event("input"));
+    }
+    window.showToast(`Imported ${file.name}`, "success");
+  }
+
+  const removeFileBtn = document.getElementById("btn-remove-file");
+  if (removeFileBtn && filePreview) {
+    removeFileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      filePreview.style.display = "none";
+      if (fileInput) fileInput.value = "";
+    });
+  }
+
+  document.querySelectorAll("[data-input-tab]").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll("[data-input-tab]").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const mode = tab.getAttribute("data-input-tab");
+      window.showToast(`Switched input mode to ${mode.toUpperCase()}`, "info");
+    });
+  });
+
+  if (generateBtn) {
+    generateBtn.addEventListener("click", async () => {
+      const content = notesTextarea.value.trim();
+      if (!content) {
+        window.showToast("Please enter notes or click 'Load Demo Notes' first.", "error");
+        notesTextarea.focus();
+        return;
+      }
+
+      const emptyState = document.getElementById("output-empty-state");
+      const loadingState = document.getElementById("output-loading-state");
+      const outputCard = document.getElementById("output-result-card");
+
+      if (emptyState) emptyState.style.display = "none";
+      if (outputCard) outputCard.style.display = "none";
+      if (loadingState) loadingState.style.display = "flex";
+
+      const loadingStepText = document.getElementById("loading-step-text");
+      const steps = [
+        "Analyzing study text and concepts...",
+        "Synthesizing key definitions and principles...",
+        "Formulating structured academic takeaways...",
+        "Finalizing structured summary..."
+      ];
+
+      let stepIndex = 0;
+      const stepInterval = setInterval(() => {
+        if (loadingStepText && stepIndex < steps.length) {
+          loadingStepText.textContent = steps[stepIndex];
+          stepIndex++;
+        }
+      }, 450);
+
+      generateBtn.disabled = true;
+      try {
+        const data = await window.store.request("/api/summarize", {
+          method: "POST",
+          body: JSON.stringify({ text: content })
+        });
+
+        clearInterval(stepInterval);
+        if (loadingState) loadingState.style.display = "none";
+        if (outputCard) {
+          outputCard.style.display = "block";
+          const titleEl = document.getElementById("generated-notes-title");
+          const editorEl = document.getElementById("notes-editor-content");
+          if (titleEl) titleEl.textContent = "AI Summary";
+          if (editorEl) {
+            const summary = document.createElement("p");
+            summary.textContent = data.summary;
+            editorEl.replaceChildren(Object.assign(document.createElement("h2"), { textContent: "Summary" }), summary);
+          }
+        }
+        window.showToast("Summary generated.", "success");
+      } catch (error) {
+        clearInterval(stepInterval);
+        if (loadingState) loadingState.style.display = "none";
+        if (outputCard) outputCard.style.display = "block";
+
+        const titleEl = document.getElementById("generated-notes-title");
+        const editorEl = document.getElementById("notes-editor-content");
+        if (titleEl) titleEl.textContent = "Error";
+        if (editorEl) {
+          editorEl.textContent = error.message || "Unable to generate the summary.";
+        }
+
+        window.showToast(error.message || "Unable to generate the summary.", "error");
+      } finally {
+        generateBtn.disabled = false;
+      }
+    });
+  }
+}
+
+function initNotesEditor() {
+  const editorEl = document.getElementById("notes-editor-content");
+  if (!editorEl) return;
+
+  // Expose current editor content for the embedded AI assistant
+  window.getCurrentNoteContent = function() {
+    return editorEl.innerText?.trim() || document.getElementById("notes-source-input")?.value?.trim() || "";
+  };
+
+  window.insertIntoNoteEditor = function(text) {
+    if (!editorEl) return;
+    const block = document.createElement("div");
+    block.style.marginTop = "16px";
+    block.style.padding = "12px";
+    block.style.borderLeft = "3px solid var(--accent-cyan)";
+    block.style.background = "rgba(56, 189, 248, 0.08)";
+    block.style.borderRadius = "var(--radius-sm)";
+    block.innerHTML = `<strong>✦ AI Assistant Summary:</strong><p style="margin-top:6px; line-height:1.5;">${escapeHtml(text).replace(/\n/g, "<br>")}</p>`;
+    editorEl.appendChild(block);
+    editorEl.focus();
+    window.showToast("Inserted AI summary into notes editor!", "success");
+  };
+
+  document.querySelectorAll("[data-format-command]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const command = btn.getAttribute("data-format-command");
+      const val = btn.getAttribute("data-format-value") || null;
+      document.execCommand(command, false, val);
+      editorEl.focus();
+    });
+  });
+
+  const aiToolsBtn = document.getElementById("btn-ai-tools");
+  const aiToolsMenu = document.getElementById("menu-ai-tools");
+  if (aiToolsBtn && aiToolsMenu) {
+    aiToolsBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      aiToolsMenu.classList.toggle("show");
+    });
+
+    document.querySelectorAll("[data-ai-action]").forEach(actionBtn => {
+      actionBtn.addEventListener("click", () => {
+        const action = actionBtn.getAttribute("data-ai-action");
+        aiToolsMenu.classList.remove("show");
+        handleAiTransformation(action);
+      });
+    });
+  }
+
+  const saveBtn = document.getElementById("btn-save-notes");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async () => {
+      const title = document.getElementById("generated-notes-title")?.textContent || "Generated Notes";
+      const content = editorEl.innerHTML;
+      const currentId = new URLSearchParams(window.location.search).get("id");
+      const newNote = {
+        id: currentId || `note-${Date.now()}`,
+        type: "note",
+        title: title,
+        category: "General",
+        date: "Today",
+        progress: 100,
+        isFavorite: false,
+        tags: ["AI Notes", "Summary"],
+        content: content
+      };
+
+      saveBtn.disabled = true;
+      try {
+        const saved = await window.store.saveItem(newNote);
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set("id", saved.id);
+        window.history.replaceState({}, "", nextUrl.toString());
+        window.showToast("Notes saved to your Library.", "success");
+        try {
+          await window.store.addActivity({ title, type: "Saved Notes", score: "Complete", icon: "📝" });
+        } catch (error) {
+          window.showToast(`Note saved, but activity could not be recorded: ${error.message}`, "error");
+        }
+      } catch (error) {
+        window.showToast(error.message || "Unable to save notes.", "error");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+  }
+
+  const downloadBtn = document.getElementById("btn-download-notes");
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", () => {
+      const title = document.getElementById("generated-notes-title")?.textContent || "Notes";
+      const textContent = editorEl.innerText;
+      const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title.replace(/\s+/g, "_")}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      window.showToast("Downloaded notes as text file!", "info");
+    });
+  }
+
+  const makeMindMapBtn = document.getElementById("btn-convert-mindmap");
+  if (makeMindMapBtn) {
+    makeMindMapBtn.addEventListener("click", () => {
+      const title = document.getElementById("generated-notes-title")?.textContent || "Study Material";
+      sessionStorage.setItem("cogni_prep_mindmap", title);
+      sessionStorage.setItem("cogni_prep_mindmap_text", editorEl.innerText.slice(0, 25000));
+      window.location.href = "mindmap.html?topic=" + encodeURIComponent(title);
+    });
+  }
+
+  const makeFlashcardsBtn = document.getElementById("btn-convert-flashcards");
+  if (makeFlashcardsBtn) {
+    makeFlashcardsBtn.addEventListener("click", () => {
+      const title = document.getElementById("generated-notes-title")?.textContent || "Study Material";
+      sessionStorage.setItem("cogni_prep_flashcards", title);
+      sessionStorage.setItem("cogni_prep_flashcards_text", editorEl.innerText.slice(0, 25000));
+      window.location.href = "flashcards.html?topic=" + encodeURIComponent(title);
+    });
+  }
+
+  const makeQuizBtn = document.getElementById("btn-convert-quiz");
+  if (makeQuizBtn) {
+    makeQuizBtn.addEventListener("click", () => {
+      const title = document.getElementById("generated-notes-title")?.textContent || "Study Material";
+      sessionStorage.setItem("cogni_prep_quiz", title);
+      sessionStorage.setItem("cogni_prep_quiz_text", editorEl.innerText.slice(0, 25000));
+      window.location.href = "quiz.html?topic=" + encodeURIComponent(title);
+    });
+  }
+
+  const calendarBtn = document.getElementById("btn-schedule-calendar");
+  if (calendarBtn) {
+    calendarBtn.addEventListener("click", () => {
+      const title = document.getElementById("generated-notes-title")?.textContent || "Revision Block";
+      const summary = editorEl.innerText.slice(0, 300);
+      const calendarUrl = window.store.generateGoogleCalendarUrl(title, summary, 45);
+      window.openSafeExternalLink(calendarUrl);
+      window.showToast("Opening Google Calendar to schedule study session...", "info");
+    });
+  }
+}
+
+async function handleAiTransformation(action) {
+  const editorEl = document.getElementById("notes-editor-content");
+  if (!editorEl) return;
+
+  const currentText = editorEl.innerText.trim();
+  if (!currentText) {
+    window.showToast("No notes content to transform.", "error");
+    return;
+  }
+
+  window.showToast(`Applying AI '${action}'...`, "info");
+  editorEl.style.opacity = "0.5";
+
+  try {
+    const transformed = await window.store.transformNotes(currentText, action);
+    editorEl.style.opacity = "1";
+
+    const formattedHtml = transformed
+      .replace(/^### (.*$)/gim, '<h4 style="color:#fff; margin:8px 0 4px;">$1</h4>')
+      .replace(/^## (.*$)/gim, '<h3 style="color:#fff; margin:10px 0 6px;">$1</h3>')
+      .replace(/\*\*(.*?)\*\*/gim, '<strong style="color:#fff;">$1</strong>')
+      .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+      .replace(/^\s*[-•*]\s+(.*)$/gim, '<li style="margin-left:14px;">$1</li>')
+      .replace(/(<li>.*<\/li>)/gims, '<ul style="margin:6px 0;">$1</ul>')
+      .replace(/\n\n+/g, '</p><p style="margin-top:6px;">')
+      .replace(/\n/g, '<br>');
+
+    editorEl.innerHTML = `<p>${formattedHtml}</p>`;
+    window.showToast(`Applied AI ${action}!`, "success");
+  } catch (error) {
+    editorEl.style.opacity = "1";
+    window.showToast(error.message || `Failed to apply '${action}'.`, "error");
+  }
+}
+
+function checkUrlParamsForEdit() {
+  const params = new URLSearchParams(window.location.search);
+  const noteId = params.get("id");
+  if (noteId) {
+    const item = window.store.getItemById(noteId);
+    if (item && item.type === "note") {
+      const emptyState = document.getElementById("output-empty-state");
+      const outputCard = document.getElementById("output-result-card");
+      const titleEl = document.getElementById("generated-notes-title");
+      const editorEl = document.getElementById("notes-editor-content");
+      if (emptyState) emptyState.style.display = "none";
+      if (outputCard) outputCard.style.display = "block";
+      if (titleEl) titleEl.textContent = item.title;
+      if (editorEl) editorEl.innerHTML = item.content;
+      window.showToast(`Loaded "${item.title}" for editing`, "info");
+    }
+  }
+}

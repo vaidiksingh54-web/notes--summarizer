@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help Center & Documentation - CogniStudy AI</title>
+  <meta name="description" content="User guide and help documentation for CogniStudy AI.">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="notes.html" class="nav-link">AI Notes</a></li>
+        <li><a href="mindmap.html" class="nav-link">Mind Map</a></li>
+        <li><a href="flashcards.html" class="nav-link">Flashcards</a></li>
+        <li><a href="quiz.html" class="nav-link">Quiz</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+        <a href="login.html" class="btn btn-primary btn-sm">Sign In</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="max-width: 920px; padding: 50px 24px 80px;">
+    <div class="glass-panel" style="padding: 40px; margin-bottom: 28px;">
+      <span class="badge badge-cyan" style="margin-bottom: 12px;">STUDENT HELP DESK</span>
+      <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 12px;">Help Center & Feature Guide</h1>
+      <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6;">
+        Explore how to use CogniStudy AI to transform your academic material into high-yield summaries, 3D active-recall flashcards, and exam-readiness quizzes.
+      </p>
+    </div>
+
+    <!-- Guides Grid -->
+    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+      <div class="glass-card" style="padding: 28px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <span style="font-size: 1.5rem;">📝</span>
+          <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff;">1. AI Notes Generator & Rich Editor</h2>
+        </div>
+        <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+          Paste raw lecture text or upload markdown/text documents up to 25,000 characters. Click <strong>Generate Notes</strong> to run server-side Gemini synthesis. Once generated:
+        </p>
+        <ul style="color: var(--text-muted); line-height: 1.7; padding-left: 20px; margin-bottom: 14px;">
+          <li>Use the <strong>AI Tools</strong> menu to Shorten, Expand, Simplify (ELI5), or format into bullets.</li>
+          <li>Format headings, bold definitions, or lists using the built-in rich toolbar.</li>
+          <li>Click <strong>Save to Library</strong> or download as a <code>.txt</code> file.</li>
+          <li>Convert directly into flashcards or quizzes with single-click conversion buttons.</li>
+        </ul>
+      </div>
+
+      <div class="glass-card" style="padding: 28px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <span style="font-size: 1.5rem;">🃏</span>
+          <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff;">2. Active Recall 3D Flashcards</h2>
+        </div>
+        <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+          Enter any academic subject or pass an existing note to generate conceptual question-and-answer flashcards:
+        </p>
+        <ul style="color: var(--text-muted); line-height: 1.7; padding-left: 20px; margin-bottom: 14px;">
+          <li>Click any card to flip between front (question) and back (in-depth explanation).</li>
+          <li>Mark cards as <strong>Mastered</strong> to advance your deck mastery progress percentage.</li>
+          <li>Use <strong>Shuffle</strong> or <strong>Restart</strong> to test your retention under varied sequence orders.</li>
+        </ul>
+      </div>
+
+      <div class="glass-card" style="padding: 28px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <span style="font-size: 1.5rem;">🕸</span>
+          <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff;">3. Visual AI Mind Map Maker</h2>
+        </div>
+        <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+          Visualize complex subjects and interconnected knowledge hierarchies:
+        </p>
+        <ul style="color: var(--text-muted); line-height: 1.7; padding-left: 20px; margin-bottom: 14px;">
+          <li>Enter any topic or paste detailed notes to generate an interactive bilateral radial tree.</li>
+          <li>Click any node to open the <strong>Concept Inspector</strong> with detailed explanations and study insights.</li>
+          <li>Click the +/- collapse indicators to collapse or expand sub-branches for focused revision.</li>
+          <li>Use smooth drag-to-pan, mouse-wheel zoom, or the toolbar controls (+, -, 100%, Fit View).</li>
+          <li>Export high-resolution PNG or SVG images, or save directly to your student library.</li>
+        </ul>
+      </div>
+
+      <div class="glass-card" style="padding: 28px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <span style="font-size: 1.5rem;">🧠</span>
+          <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff;">4. Comprehensive Self-Testing Quizzes</h2>
+        </div>
+        <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+          Select between 5 or 10 questions to test theoretical and applied comprehension:
+        </p>
+        <ul style="color: var(--text-muted); line-height: 1.7; padding-left: 20px; margin-bottom: 14px;">
+          <li>Track elapsed time with the built-in quiz timer.</li>
+          <li>Receive a complete percentage score breakdown upon submission.</li>
+          <li>Review question-by-question explanations with highlighted correct answers and rationales.</li>
+        </ul>
+      </div>
+
+      <div class="glass-card" style="padding: 28px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <span style="font-size: 1.5rem;">📅</span>
+          <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff;">5. Google Calendar Study Session Sync</h2>
+        </div>
+        <p style="color: var(--text-muted); line-height: 1.6;">
+          Every study tool includes a <strong>Schedule in Google Calendar</strong> button. It creates a pre-populated 45-minute revision block with study topic summaries and actionable review goals.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: 36px; padding: 24px; text-align: center; border-radius: var(--radius-lg); background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2);">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Still have questions or encountered an issue?</h3>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;">
+        Review our <a href="disclaimer.html" style="color: var(--accent-cyan); text-decoration: underline;">Academic Disclaimer</a> or return to the student workspace.
+      </p>
+      <a href="dashboard.html" class="btn btn-primary btn-sm">Return to Dashboard →</a>
+    </div>
+  </main>
+
+  <footer style="padding: 30px 0; border-top: 1px solid var(--border-subtle); font-size: 0.82rem; color: var(--text-faint); text-align: center;">
+    © 2026 CogniStudy AI • <a href="privacy.html" style="color: var(--text-muted);">Privacy</a> • <a href="terms.html" style="color: var(--text-muted);">Terms</a> • <a href="cookies.html" style="color: var(--text-muted);">Cookies</a>
+  </footer>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

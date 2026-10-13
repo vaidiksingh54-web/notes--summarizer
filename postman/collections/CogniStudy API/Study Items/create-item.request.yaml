@@ -1,0 +1,31 @@
+$kind: http-request
+name: Create Item
+method: POST
+url: '{{baseUrl}}/api/items'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "item-test-001",
+      "type": "note",
+      "title": "Photosynthesis Notes",
+      "category": "Biology",
+      "date": "2026-10-11",
+      "progress": 50,
+      "content": "Photosynthesis is the process by which plants make food using sunlight.",
+      "isFavorite": false
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", () => pm.response.to.have.status(201));
+      pm.test("Item created", () => {
+        const json = pm.response.json();
+        pm.expect(json.item).to.be.an("object");
+        pm.collectionVariables.set("itemId", json.item.id);
+      });

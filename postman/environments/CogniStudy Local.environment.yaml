@@ -1,0 +1,9 @@
+$kind: environment
+name: CogniStudy Local
+variables:
+  - key: baseUrl
+    value: 'http://127.0.0.1:5000'
+    enabled: true
+  - key: authToken
+    value: ''
+    enabled: true

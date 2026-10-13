@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie & Storage Notice - CogniStudy AI</title>
+  <meta name="description" content="Cookie and browser storage notice for CogniStudy AI.">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="help.html" class="nav-link">Help</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-secondary btn-sm">Sign In</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="max-width: 860px; padding: 50px 24px 80px;">
+    <div class="glass-panel" style="padding: 40px;">
+      <span class="badge badge-amber" style="margin-bottom: 12px;">BROWSER STORAGE</span>
+      <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 12px;">Cookie & Storage Notice</h1>
+      <p style="color: var(--text-faint); font-size: 0.88rem; margin-bottom: 28px;">Last verified: October 2026</p>
+
+      <section style="margin-bottom: 28px; line-height: 1.7; color: var(--text-muted);">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 10px;">1. Essential Session Tokens</h2>
+        <p style="margin-bottom: 12px;">
+          CogniStudy AI uses browser <code style="color: var(--accent-cyan); background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;">localStorage</code> strictly for maintaining your authenticated student session (<code style="color: var(--accent-cyan); background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;">cogni_session_token</code>) across page transitions.
+        </p>
+        <p>
+          This token is strictly essential for application security and account access.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 28px; line-height: 1.7; color: var(--text-muted);">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 10px;">2. Zero Advertising or Tracking Cookies</h2>
+        <p>
+          We do not employ third-party analytics trackers, advertising cookies, fingerprinting pixels, or behavioral profiling technologies.
+        </p>
+      </section>
+
+      <section style="line-height: 1.7; color: var(--text-muted);">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 10px;">3. Managing Your Browser Storage</h2>
+        <p>
+          You can clear your session token at any time by clicking "Logout" in the student menu or clearing site data in your browser settings.
+        </p>
+      </section>
+
+      <div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <a href="index.html" class="btn btn-secondary btn-sm">← Back to Home</a>
+        <a href="privacy.html" class="btn btn-ghost btn-sm" style="color: var(--accent-cyan);">Privacy Policy →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer style="padding: 30px 0; border-top: 1px solid var(--border-subtle); font-size: 0.82rem; color: var(--text-faint); text-align: center;">
+    © 2026 CogniStudy AI • <a href="privacy.html" style="color: var(--text-muted);">Privacy</a> • <a href="terms.html" style="color: var(--text-muted);">Terms</a>
+  </footer>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

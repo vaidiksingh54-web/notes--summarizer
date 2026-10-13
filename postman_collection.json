@@ -1,0 +1,260 @@
+{
+  "info": {
+    "name": "CogniStudy AI - Complete API Collection",
+    "description": "API collection to test all backend routes including Auth, AI Study Tools, Study Items CRUD, and Student Profile.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. System Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "2. Auth - Demo Login (Captures Token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.token) {",
+              "    pm.collectionVariables.set('token', jsonData.token);",
+              "    console.log('Saved token:', jsonData.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"demo@cognistudy.ai\",\n  \"password\": \"CogniStudy123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "login"]
+        }
+      }
+    },
+    {
+      "name": "3. Auth - Create Student Account (Signup)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Student Tester\",\n  \"email\": \"test.student@university.edu\",\n  \"password\": \"StudyHard2026!\",\n  \"college\": \"MIT\",\n  \"course\": \"Computer Science\",\n  \"phone\": \"+1 555-0199\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/signup",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "signup"]
+        }
+      }
+    },
+    {
+      "name": "4. AI - Summarize Notes",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Mitochondria generate most of the chemical energy needed to power the cells biochemical reactions. Chemical energy produced by the mitochondria is stored in adenosine triphosphate (ATP).\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/summarize",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "summarize"]
+        }
+      }
+    },
+    {
+      "name": "5. AI - Generate Flashcards",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"Cellular Respiration\",\n  \"count\": 3,\n  \"difficulty\": \"medium\",\n  \"sourceText\": \"Glycolysis takes place in the cytoplasm. Krebs cycle occurs in mitochondrial matrix.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/flashcards/generate",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "flashcards", "generate"]
+        }
+      }
+    },
+    {
+      "name": "6. AI - Generate Quiz",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"Operating Systems - Deadlocks\",\n  \"count\": 3,\n  \"difficulty\": \"hard\",\n  \"sourceText\": \"The 4 conditions for deadlock are mutual exclusion, hold and wait, no preemption, and circular wait.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/generate",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "generate"]
+        }
+      }
+    },
+    {
+      "name": "7. AI - Generate Mind Map",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"Machine Learning Fundamentals\",\n  \"depth\": 3,\n  \"text\": \"Supervised, unsupervised, and reinforcement learning. Gradient descent, loss functions, neural networks.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/mindmap/generate",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "mindmap", "generate"]
+        }
+      }
+    },
+    {
+      "name": "8. AI - Chat Tutor",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Can you give me an active recall question about binary search trees?\",\n  \"context\": \"Data structures and algorithms.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/ai/chat",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "ai", "chat"]
+        }
+      }
+    },
+    {
+      "name": "9. AI - Transform Notes",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"TCP uses a three-way handshake: SYN, SYN-ACK, ACK. UDP is connectionless and does not guarantee packet delivery.\",\n  \"action\": \"bullets\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/ai/transform",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "ai", "transform"]
+        }
+      }
+    },
+    {
+      "name": "10. Items - Get All Study Items",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/items?type=all",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "items"],
+          "query": [{ "key": "type", "value": "all" }]
+        }
+      }
+    },
+    {
+      "name": "11. Items - Create Study Item",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Postman Test Note\",\n  \"type\": \"note\",\n  \"date\": \"2026-10-11\",\n  \"content\": {\n    \"summary\": \"Testing via Postman API suite\",\n    \"notes\": \"All endpoints functional\"\n  },\n  \"tags\": [\"test\", \"api\"]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "items"]
+        }
+      }
+    },
+    {
+      "name": "12. Profile - Get Bootstrap Data",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/bootstrap",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "bootstrap"]
+        }
+      }
+    },
+    {
+      "name": "13. Auth - Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/logout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "logout"]
+        }
+      }
+    }
+  ]
+}

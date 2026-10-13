@@ -1,0 +1,20 @@
+$kind: http-request
+name: Summarize
+method: POST
+url: '{{baseUrl}}/api/summarize'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "text": "Photosynthesis is the process used by plants, algae and certain bacteria to harness energy from sunlight and turn it into chemical energy. Here, we describe the general principles of photosynthesis and highlight how scientists are researching this natural process to help develop clean fuels and sources of renewable energy."
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", () => pm.response.to.have.status(200));
+      pm.test("Has summary", () => pm.expect(pm.response.json().summary).to.be.a("string"));

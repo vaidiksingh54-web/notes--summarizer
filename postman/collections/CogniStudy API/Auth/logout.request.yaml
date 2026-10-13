@@ -1,0 +1,12 @@
+$kind: http-request
+name: Logout (moved to Teardown folder)
+method: POST
+url: '{{baseUrl}}/api/logout'
+order: 99999
+auth:
+  type: noauth
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      pm.execution.skipRequest();

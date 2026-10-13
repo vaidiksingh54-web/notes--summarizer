@@ -1,0 +1,11 @@
+$kind: http-request
+name: Get Profile
+method: GET
+url: '{{baseUrl}}/api/profile'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", () => pm.response.to.have.status(200));
+      pm.test("Has profile", () => pm.expect(pm.response.json().profile).to.be.an("object"));

@@ -1,0 +1,6 @@
+{
+  "name": "CogniStudy AI - Smart AI Study Assistant",
+  "description": "Next-gen AI learning platform to turn lengthy notes into clear summaries, interactive flashcards, and self-testing quizzes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

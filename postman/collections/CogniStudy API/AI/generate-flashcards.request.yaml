@@ -1,0 +1,22 @@
+$kind: http-request
+name: Generate Flashcards
+method: POST
+url: '{{baseUrl}}/api/flashcards/generate'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "topic": "Photosynthesis",
+      "count": 3,
+      "difficulty": "medium"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", () => pm.response.to.have.status(200));
+      pm.test("Has cards array", () => pm.expect(pm.response.json().cards).to.be.an("array"));

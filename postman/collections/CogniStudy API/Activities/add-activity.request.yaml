@@ -1,0 +1,27 @@
+$kind: http-request
+name: Add Activity
+method: POST
+url: '{{baseUrl}}/api/activities'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Studied Photosynthesis",
+      "type": "note",
+      "score": "85%",
+      "icon": "📝"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", () => pm.response.to.have.status(201));
+      pm.test("Activity created", () => {
+        const json = pm.response.json();
+        pm.expect(json.activity).to.be.an("object");
+        pm.collectionVariables.set("activityId", json.activity.id);
+      });

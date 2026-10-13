@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Notes Generator & Editor - CogniStudy AI</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <!-- Reusable App Navbar -->
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="mobile-sidebar-toggle" class="mobile-menu-toggle" aria-label="Toggle Navigation">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+        </a>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li class="nav-dropdown">
+          <a href="#" class="nav-link" data-dropdown-toggle="dropdown-revision">
+            Revision <span style="font-size: 10px;">▼</span>
+          </a>
+          <div id="dropdown-revision" class="dropdown-menu">
+            <a href="mindmap.html" class="dropdown-item"><span>🕸</span> AI Mind Map</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> AI Flashcards</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> AI Quiz</a>
+            <div class="dropdown-divider"></div>
+            <a href="library.html?filter=favorites" class="dropdown-item"><span>⭐</span> Starred Materials</a>
+          </div>
+        </li>
+        <li><a href="notes.html" class="nav-link active">AI Notes</a></li>
+        <li><a href="mindmap.html" class="nav-link">Mind Map</a></li>
+        <li><a href="flashcards.html" class="nav-link">AI Flashcards</a></li>
+        <li><a href="quiz.html" class="nav-link">AI Quiz</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="nav-dropdown">
+          <button id="btn-create-nav" class="btn btn-primary btn-sm">
+            <span style="font-size: 14px; font-weight: 700;">+</span> Create
+          </button>
+          <div id="dropdown-create-menu" class="dropdown-menu right-aligned">
+            <a href="notes.html" class="dropdown-item"><span>✨</span> AI Notes Generator</a>
+            <a href="mindmap.html" class="dropdown-item"><span>🕸</span> AI Mind Map</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> AI Flashcard Deck</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> Self-Testing Quiz</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <button id="btn-notification" class="nav-icon-btn" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="nav-badge"></span>
+          </button>
+          <div id="panel-notification" class="dropdown-menu right-aligned" style="width: 320px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">Notifications</span>
+              <button id="btn-mark-all-read" class="btn btn-ghost btn-sm" style="font-size: 0.75rem; color: var(--accent-cyan); padding: 2px 6px;">
+                Mark all read
+              </button>
+            </div>
+            <div id="notification-list"></div>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div id="btn-avatar-nav" class="avatar-btn">
+            <div class="avatar-img user-avatar-display">ST</div>
+            <span class="user-name-display" style="font-size: 0.88rem; font-weight: 500; color: #fff;">Student</span>
+            <span style="font-size: 10px; color: var(--text-faint);">▼</span>
+          </div>
+          <div id="dropdown-profile-menu" class="dropdown-menu right-aligned">
+            <a href="profile.html" class="dropdown-item"><span>👤</span> Profile Settings</a>
+            <a href="library.html" class="dropdown-item"><span>📚</span> My Library</a>
+            <a href="help.html" class="dropdown-item"><span>❓</span> Help & Support</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" id="btn-logout" class="dropdown-item" style="color: #fb7185;"><span>🚪</span> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-heading">STUDY TOOLS</div>
+        <a href="dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+        <a href="library.html" class="sidebar-item"><span>📚</span> My Library</a>
+        <a href="notes.html" class="sidebar-item active"><span>📝</span> AI Notes</a>
+        <a href="mindmap.html" class="sidebar-item"><span>🕸</span> AI Mind Map</a>
+        <a href="flashcards.html" class="sidebar-item"><span>🃏</span> Flashcards</a>
+        <a href="quiz.html" class="sidebar-item"><span>🧠</span> Quizzes</a>
+        <a href="library.html?filter=favorites" class="sidebar-item"><span>⭐</span> Favorites</a>
+
+        <div class="sidebar-heading">ACCOUNT & SUPPORT</div>
+        <a href="profile.html" class="sidebar-item"><span>⚙</span> Settings & Profile</a>
+        <a href="help.html" class="sidebar-item"><span>❓</span> Help & FAQ</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div style="margin-bottom: 28px;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 6px;">AI Notes Generator</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">
+          Transform your raw lecture notes, textbooks, and transcripts into clear, structured study summaries.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch;">
+        <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+              <div class="tab-list">
+                <button class="tab-btn active" data-input-tab="text">Text</button>
+                <button class="tab-btn" data-input-tab="doc">Document</button>
+              </div>
+
+              <button id="btn-load-demo-notes" class="btn btn-ghost btn-sm" style="color: var(--accent-cyan); font-weight: 600;">
+                Load Demo Notes ↗
+              </button>
+            </div>
+
+            <textarea id="notes-source-input" class="glass-textarea" rows="9" placeholder="Paste your study material, lecture transcript, or chapter text here..."></textarea>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 16px;">
+              <span id="char-count" style="font-size: 0.78rem; color: var(--text-faint);">0 / 25,000 characters</span>
+              <button id="btn-clear-notes" class="btn btn-ghost btn-sm" style="font-size: 0.8rem; color: var(--text-muted);">Clear</button>
+            </div>
+
+            <input type="file" id="doc-file-input" style="display: none;" accept=".txt,.md,.pdf,.docx">
+            <div class="dropzone" id="file-dropzone">
+              <div class="dropzone-icon">↑</div>
+              <div style="font-weight: 600; color: #fff; font-size: 0.95rem;">Drag & drop your document or browse</div>
+              <div style="font-size: 0.8rem; color: var(--text-faint); margin-top: 4px;">Supports TXT and Markdown files for text extraction</div>
+            </div>
+
+            <div id="file-preview" class="file-preview-card" style="display: none;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.2rem;">📄</span>
+                <div>
+                  <div id="preview-file-name" style="font-weight: 600; color: #fff; font-size: 0.88rem;">lecture_notes.txt</div>
+                  <div id="preview-file-size" style="font-size: 0.75rem; color: var(--text-faint);">0.4 MB</div>
+                </div>
+              </div>
+              <button id="btn-remove-file" class="btn btn-ghost btn-sm" style="color: #fb7185;">Remove</button>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button onclick="openModal('modal-notes-options')" class="btn btn-secondary" style="flex: 0 0 auto;">
+              <span>⚙</span> Options
+            </button>
+            <button id="btn-generate-notes" class="btn btn-primary" style="flex: 1;">
+              Generate Notes ✦
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column;">
+          <div id="output-empty-state" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 20px;">
+            <div style="width: 56px; height: 56px; border-radius: 14px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--accent-cyan); font-size: 1.5rem;">
+              ✦
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 8px;">Your generated notes will appear here.</h3>
+            <p style="font-size: 0.9rem; color: var(--text-faint); max-width: 380px;">
+              Paste source lecture material on the left and click <strong>Generate Notes</strong> to synthesize key concepts with Gemini.
+            </p>
+          </div>
+
+          <div id="output-loading-state" style="display: none; flex: 1; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 20px;">
+            <div class="animate-spin" style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid rgba(99, 102, 241, 0.2); border-top-color: var(--accent-cyan); margin-bottom: 20px;"></div>
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 6px;">✨ AI is generating your notes...</h3>
+            <p id="loading-step-text" style="font-size: 0.88rem; color: var(--accent-cyan);">Analyzing study text and concepts...</p>
+          </div>
+
+          <div id="output-result-card" style="display: none; flex: 1; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <span class="badge badge-cyan" style="margin-bottom: 4px;">GENERATED NOTE</span>
+                <h2 id="generated-notes-title" style="font-size: 1.2rem; font-weight: 700; color: #fff;">Summary</h2>
+              </div>
+
+              <div class="nav-dropdown">
+                <button id="btn-ai-tools" class="btn btn-secondary btn-sm" style="border-color: var(--accent-purple); color: #c084fc;">
+                  ✨ AI Tools ▼
+                </button>
+                <div id="menu-ai-tools" class="dropdown-menu right-aligned" style="width: 220px;">
+                  <button class="dropdown-item" data-ai-action="shorten"><span>⚡</span> Shorten Summary</button>
+                  <button class="dropdown-item" data-ai-action="expand"><span>📖</span> Extend / Deep Dive</button>
+                  <button class="dropdown-item" data-ai-action="simplify"><span>🧒</span> Simplify (ELI5)</button>
+                  <button class="dropdown-item" data-ai-action="bullets"><span>•</span> Format as Bullets</button>
+                  <button class="dropdown-item" data-ai-action="rephrase"><span>✍</span> Rephrase Academic</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="editor-toolbar">
+              <button class="toolbar-btn" data-format-command="undo" title="Undo">↶</button>
+              <button class="toolbar-btn" data-format-command="redo" title="Redo">↷</button>
+              <div class="toolbar-divider"></div>
+              <button class="toolbar-btn" data-format-command="bold" title="Bold"><strong>B</strong></button>
+              <button class="toolbar-btn" data-format-command="italic" title="Italic"><em>I</em></button>
+              <button class="toolbar-btn" data-format-command="underline" title="Underline"><u>U</u></button>
+              <div class="toolbar-divider"></div>
+              <button class="toolbar-btn" data-format-command="insertUnorderedList" title="Bullet List">•≡</button>
+              <button class="toolbar-btn" data-format-command="insertOrderedList" title="Numbered List">1.≡</button>
+              <div class="toolbar-divider"></div>
+              <button class="toolbar-btn" data-format-command="formatBlock" data-format-value="h2" title="Heading 2">H2</button>
+              <button class="toolbar-btn" data-format-command="formatBlock" data-format-value="p" title="Paragraph">P</button>
+            </div>
+
+            <div id="notes-editor-content" class="editor-content" contenteditable="true"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; gap: 8px;">
+                <button id="btn-save-notes" class="btn btn-primary btn-sm">
+                  <span>💾</span> Save to Library
+                </button>
+                <button id="btn-download-notes" class="btn btn-secondary btn-sm">
+                  <span>📥</span> Download .txt
+                </button>
+                <button onclick="openModal('modal-share')" class="btn btn-secondary btn-sm">
+                  <span>🔗</span> Share
+                </button>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button id="btn-convert-mindmap" class="btn btn-secondary btn-sm" style="color: var(--accent-cyan);">
+                  <span>🕸</span> Make Mind Map
+                </button>
+                <button id="btn-convert-flashcards" class="btn btn-secondary btn-sm" style="color: var(--accent-purple);">
+                  <span>🃏</span> Make Flashcards
+                </button>
+                <button id="btn-convert-quiz" class="btn btn-secondary btn-sm" style="color: var(--accent-emerald);">
+                  <span>🧠</span> Make Quiz
+                </button>
+                <button id="btn-schedule-calendar" class="btn btn-secondary btn-sm" title="Schedule revision in Google Calendar">
+                  <span>📅</span> Add to Calendar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal-notes-options" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Generation Options</h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-notes-options')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Summary Length</label>
+          <select id="option-length" class="glass-select">
+            <option value="short">Short (Quick Revision)</option>
+            <option value="medium" selected>Medium (Standard Study)</option>
+            <option value="comprehensive">Comprehensive (Deep Dive)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Difficulty Level</label>
+          <select id="option-difficulty" class="glass-select">
+            <option value="beginner">Beginner (Introductory)</option>
+            <option value="intermediate" selected>Intermediate (College Level)</option>
+            <option value="advanced">Advanced (Exam & Research)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Note Style</label>
+          <select id="option-style" class="glass-select">
+            <option value="detailed" selected>Detailed Sections with Key Points</option>
+            <option value="bulleted">Bullet Points & Formulae</option>
+            <option value="cheatsheet">Exam Cheatsheet / Rapid Recall</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-notes-options')">Cancel</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-notes-options'); showToast('Preferences saved.', 'success');">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-share" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Share Study Material</h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-share')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+          Anyone with this private link can view this study material in their browser.
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="share-link-input" class="glass-input" readonly value="">
+          <button class="btn btn-primary btn-sm" onclick="navigator.clipboard?.writeText(document.getElementById('share-link-input').value); showToast('Share link copied to clipboard!', 'success'); closeModal('modal-share');">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/notes.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const shareInput = document.getElementById("share-link-input");
+      if (shareInput) {
+        shareInput.value = window.location.href;
+      }
+    });
+  </script>
+</body>
+</html>

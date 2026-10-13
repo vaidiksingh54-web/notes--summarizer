@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Flashcards - CogniStudy AI</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <!-- Reusable App Navbar -->
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="mobile-sidebar-toggle" class="mobile-menu-toggle" aria-label="Toggle Navigation">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+        </a>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li class="nav-dropdown">
+          <a href="#" class="nav-link" data-dropdown-toggle="dropdown-revision">
+            Revision <span style="font-size: 10px;">▼</span>
+          </a>
+          <div id="dropdown-revision" class="dropdown-menu">
+            <a href="mindmap.html" class="dropdown-item"><span>🕸</span> AI Mind Map</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> Active Recall Flashcards</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> AI Quiz</a>
+            <div class="dropdown-divider"></div>
+            <a href="library.html?filter=favorites" class="dropdown-item"><span>⭐</span> Starred Materials</a>
+          </div>
+        </li>
+        <li><a href="notes.html" class="nav-link">AI Notes</a></li>
+        <li><a href="mindmap.html" class="nav-link">Mind Map</a></li>
+        <li><a href="flashcards.html" class="nav-link active">AI Flashcards</a></li>
+        <li><a href="quiz.html" class="nav-link">AI Quiz</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="nav-dropdown">
+          <button id="btn-create-nav" class="btn btn-primary btn-sm">
+            <span style="font-size: 14px; font-weight: 700;">+</span> Create
+          </button>
+          <div id="dropdown-create-menu" class="dropdown-menu right-aligned">
+            <a href="notes.html" class="dropdown-item"><span>✨</span> AI Notes Generator</a>
+            <a href="mindmap.html" class="dropdown-item"><span>🕸</span> AI Mind Map</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> AI Flashcard Deck</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> Self-Testing Quiz</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <button id="btn-notification" class="nav-icon-btn" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="nav-badge"></span>
+          </button>
+          <div id="panel-notification" class="dropdown-menu right-aligned" style="width: 320px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">Notifications</span>
+              <button id="btn-mark-all-read" class="btn btn-ghost btn-sm" style="font-size: 0.75rem; color: var(--accent-cyan); padding: 2px 6px;">
+                Mark all read
+              </button>
+            </div>
+            <div id="notification-list"></div>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div id="btn-avatar-nav" class="avatar-btn">
+            <div class="avatar-img user-avatar-display">ST</div>
+            <span class="user-name-display" style="font-size: 0.88rem; font-weight: 500; color: #fff;">Student</span>
+            <span style="font-size: 10px; color: var(--text-faint);">▼</span>
+          </div>
+          <div id="dropdown-profile-menu" class="dropdown-menu right-aligned">
+            <a href="profile.html" class="dropdown-item"><span>👤</span> Profile Settings</a>
+            <a href="library.html" class="dropdown-item"><span>📚</span> My Library</a>
+            <a href="help.html" class="dropdown-item"><span>❓</span> Help & Support</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" id="btn-logout" class="dropdown-item" style="color: #fb7185;"><span>🚪</span> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-heading">STUDY TOOLS</div>
+        <a href="dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+        <a href="library.html" class="sidebar-item"><span>📚</span> My Library</a>
+        <a href="notes.html" class="sidebar-item"><span>📝</span> AI Notes</a>
+        <a href="mindmap.html" class="sidebar-item"><span>🕸</span> AI Mind Map</a>
+        <a href="flashcards.html" class="sidebar-item active"><span>🃏</span> Flashcards</a>
+        <a href="quiz.html" class="sidebar-item"><span>🧠</span> Quizzes</a>
+        <a href="library.html?filter=favorites" class="sidebar-item"><span>⭐</span> Favorites</a>
+
+        <div class="sidebar-heading">ACCOUNT & SUPPORT</div>
+        <a href="profile.html" class="sidebar-item"><span>⚙</span> Settings & Profile</a>
+        <a href="help.html" class="sidebar-item"><span>❓</span> Help & FAQ</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div style="margin-bottom: 28px;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 6px;">AI Flashcard Generator</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">
+          Generate interactive active-recall flashcard decks from topics, lectures, or summaries.
+        </p>
+      </div>
+
+      <div class="glass-panel" style="padding: 24px; margin-bottom: 32px;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: flex-end;">
+          <div>
+            <label class="form-label">Topic or Subject</label>
+            <input type="text" id="fc-topic-input" class="glass-input" placeholder="e.g. C Programming Loops, Digital Logic, Photosynthesis" value="Photosynthesis & Cellular Respiration">
+          </div>
+
+          <div>
+            <label class="form-label">Number of Cards</label>
+            <select id="fc-card-count" class="glass-select">
+              <option value="4">4 Cards (Quick)</option>
+              <option value="6" selected>6 Cards (Recommended)</option>
+              <option value="8">8 Cards (In-Depth)</option>
+              <option value="10">10 Cards (Full Chapter)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label">Difficulty</label>
+            <select id="fc-difficulty" class="glass-select">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard (Exam Prep)</option>
+            </select>
+          </div>
+
+          <div>
+            <button id="btn-generate-flashcards" class="btn btn-primary" style="height: 44px; padding: 0 24px;">
+              Generate Cards ✦
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="fc-arena">
+        <div id="fc-empty-state" class="glass-panel" style="padding: 60px 20px; text-align: center;">
+          <div style="width: 56px; height: 56px; border-radius: 14px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.25); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--accent-purple); font-size: 1.5rem;">
+            🃏
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 8px;">No active flashcard deck loaded.</h3>
+          <p style="font-size: 0.9rem; color: var(--text-faint); max-width: 400px; margin: 0 auto 20px;">
+            Enter a subject above and click <strong>Generate Cards</strong> or choose a deck from your library.
+          </p>
+          <a href="library.html?type=flashcards" class="btn btn-secondary btn-sm">Explore Saved Decks ↗</a>
+        </div>
+
+        <div id="fc-loading-state" class="glass-panel" style="display: none; padding: 60px 20px; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+          <div class="animate-spin" style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid rgba(168, 85, 247, 0.2); border-top-color: var(--accent-purple); margin-bottom: 20px;"></div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 6px;">✨ Synthesizing Active Recall Flashcards...</h3>
+          <p style="font-size: 0.88rem; color: var(--accent-purple);">Formulating conceptual question-and-answer pairs with Gemini...</p>
+        </div>
+
+        <div id="fc-player-stage" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; max-width: 620px; margin-left: auto; margin-right: auto;">
+            <div>
+              <span id="deck-title-display" class="badge badge-purple" style="font-size: 0.78rem;">Cellular Energy</span>
+              <div id="card-index-indicator" style="font-size: 0.82rem; font-weight: 700; color: var(--text-faint); margin-top: 4px;">CARD 1 / 6</div>
+            </div>
+            
+            <div id="mastered-count-display" class="badge badge-emerald">0 / 6 Mastered</div>
+          </div>
+
+          <div style="height: 6px; max-width: 620px; margin: 0 auto 24px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;">
+            <div id="deck-progress-bar" style="height: 100%; width: 16%; background: linear-gradient(90deg, #818cf8, #c084fc); border-radius: 99px; transition: width 0.3s ease;"></div>
+          </div>
+
+          <div class="flashcard-stage">
+            <div id="flashcard-inner" class="flashcard-inner">
+              <div class="flashcard-front">
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                  <span class="badge badge-cyan" style="font-size: 0.7rem;">QUESTION</span>
+                  <span style="font-size: 0.8rem; color: var(--text-faint);">Click card to flip ↻</span>
+                </div>
+
+                <div id="fc-front-question" style="font-size: 1.35rem; font-weight: 600; color: #fff; line-height: 1.5; padding: 20px 0;"></div>
+
+                <button id="btn-flip-card" class="btn btn-secondary btn-sm" style="color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3);">
+                  <span>↻</span> Show Answer
+                </button>
+              </div>
+
+              <div class="flashcard-back">
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                  <span class="badge badge-purple" style="font-size: 0.7rem;">ANSWER EXPLANATION</span>
+                  <span style="font-size: 0.8rem; color: var(--text-faint);">Click to flip back ↻</span>
+                </div>
+
+                <div id="fc-back-answer" style="font-size: 1.15rem; font-weight: 500; color: #e2e8f0; line-height: 1.6; padding: 14px 0;"></div>
+
+                <div style="display: flex; gap: 8px;">
+                  <button id="btn-mark-mastered" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, #059669, #10b981);">
+                    <span>✓</span> Mark as Mastered
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 28px; max-width: 620px; margin-left: auto; margin-right: auto; flex-wrap: wrap;">
+            <button id="btn-prev-card" class="btn btn-secondary" style="padding: 10px 20px;">
+              ← Previous
+            </button>
+            <button id="btn-next-card" class="btn btn-secondary" style="padding: 10px 20px;">
+              Next →
+            </button>
+            <button id="btn-shuffle-deck" class="btn btn-ghost btn-sm">
+              <span>🔀</span> Shuffle
+            </button>
+            <button id="btn-restart-deck" class="btn btn-ghost btn-sm">
+              <span>↺</span> Restart
+            </button>
+            <button id="btn-save-deck" class="btn btn-primary btn-sm">
+              <span>💾</span> Save Deck
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/flashcards.js"></script>
+</body>
+</html>

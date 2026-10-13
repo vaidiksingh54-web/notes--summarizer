@@ -1,0 +1,38 @@
+$kind: http-request
+name: Sign Up
+method: POST
+url: '{{baseUrl}}/api/signup'
+order: 2000
+auth:
+  type: noauth
+headers:
+  - key: Content-Type
+    value: application/json
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      const ts = Date.now();
+      pm.collectionVariables.set("testEmail", `testuser_${ts}@college.edu`);
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", () => pm.response.to.have.status(201));
+      pm.test("Has token", () => {
+        const json = pm.response.json();
+        pm.expect(json.token).to.be.a("string");
+        pm.collectionVariables.set("authToken", json.token);
+        pm.environment.set("authToken", json.token);
+      });
+      pm.test("Has profile", () => pm.expect(pm.response.json().profile.name).to.eql("Test Student"));
+body:
+  type: json
+  content: |-
+    {
+      "name": "Test Student",
+      "email": "{{testEmail}}",
+      "password": "student12",
+      "college": "City Engineering College",
+      "course": "Computer Science",
+      "phone": "9876543210"
+    }

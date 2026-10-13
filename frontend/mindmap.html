@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Mind Map Maker - CogniStudy AI</title>
+  <meta name="description" content="Generate clear, visual, interactive mind maps from study notes and academic lecture material with CogniStudy AI.">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/mindmap.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="ambient-glow-top-right"></div>
+  <div class="ambient-glow-bottom-left"></div>
+
+  <!-- Reusable App Navbar -->
+  <nav class="app-navbar">
+    <div class="container nav-container">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="mobile-sidebar-toggle" class="mobile-menu-toggle" aria-label="Toggle Navigation">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <span>CogniStudy <span class="text-gradient-purple">AI</span></span>
+        </a>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li class="nav-dropdown">
+          <a href="#" class="nav-link" data-dropdown-toggle="dropdown-revision">
+            Revision <span style="font-size: 10px;">▼</span>
+          </a>
+          <div id="dropdown-revision" class="dropdown-menu">
+            <a href="mindmap.html" class="dropdown-item"><span>🕸</span> AI Mind Map</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> AI Flashcards</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> AI Quiz</a>
+            <div class="dropdown-divider"></div>
+            <a href="library.html?filter=favorites" class="dropdown-item"><span>⭐</span> Starred Materials</a>
+          </div>
+        </li>
+        <li><a href="notes.html" class="nav-link">AI Notes</a></li>
+        <li><a href="mindmap.html" class="nav-link active">Mind Map</a></li>
+        <li><a href="flashcards.html" class="nav-link">AI Flashcards</a></li>
+        <li><a href="quiz.html" class="nav-link">AI Quiz</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="nav-dropdown">
+          <button id="btn-create-nav" class="btn btn-primary btn-sm">
+            <span style="font-size: 14px; font-weight: 700;">+</span> Create
+          </button>
+          <div id="dropdown-create-menu" class="dropdown-menu right-aligned">
+            <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-faint); padding: 4px 12px; letter-spacing: 0.08em;">CREATE NEW</div>
+            <a href="mindmap.html" class="dropdown-item"><span>🕸</span> AI Mind Map Maker</a>
+            <a href="notes.html" class="dropdown-item"><span>✨</span> AI Notes Generator</a>
+            <a href="flashcards.html" class="dropdown-item"><span>🃏</span> AI Flashcard Deck</a>
+            <a href="quiz.html" class="dropdown-item"><span>🧠</span> Self-Testing Quiz</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <button id="btn-notification" class="nav-icon-btn" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="nav-badge"></span>
+          </button>
+          <div id="panel-notification" class="dropdown-menu right-aligned" style="width: 320px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">Notifications</span>
+              <button id="btn-mark-all-read" class="btn btn-ghost btn-sm" style="font-size: 0.75rem; color: var(--accent-cyan); padding: 2px 6px;">
+                Mark all read
+              </button>
+            </div>
+            <div id="notification-list"></div>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div id="btn-avatar-nav" class="avatar-btn">
+            <div class="avatar-img user-avatar-display">ST</div>
+            <span class="user-name-display" style="font-size: 0.88rem; font-weight: 500; color: #fff;">Student</span>
+            <span style="font-size: 10px; color: var(--text-faint);">▼</span>
+          </div>
+          <div id="dropdown-profile-menu" class="dropdown-menu right-aligned">
+            <a href="profile.html" class="dropdown-item"><span>👤</span> Profile Settings</a>
+            <a href="library.html" class="dropdown-item"><span>📚</span> My Library</a>
+            <a href="help.html" class="dropdown-item"><span>❓</span> Help & Support</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" id="btn-logout" class="dropdown-item" style="color: #fb7185;"><span>🚪</span> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-heading">STUDY TOOLS</div>
+        <a href="dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+        <a href="library.html" class="sidebar-item"><span>📚</span> My Library</a>
+        <a href="notes.html" class="sidebar-item"><span>📝</span> AI Notes</a>
+        <a href="mindmap.html" class="sidebar-item active"><span>🕸</span> Mind Map</a>
+        <a href="flashcards.html" class="sidebar-item"><span>🃏</span> Flashcards</a>
+        <a href="quiz.html" class="sidebar-item"><span>🧠</span> Quizzes</a>
+        <a href="library.html?filter=favorites" class="sidebar-item"><span>⭐</span> Favorites</a>
+
+        <div class="sidebar-heading">ACCOUNT & SUPPORT</div>
+        <a href="profile.html" class="sidebar-item"><span>⚙</span> Settings & Profile</a>
+        <a href="help.html" class="sidebar-item"><span>❓</span> Help & FAQ</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <div class="badge badge-cyan" style="margin-bottom: 8px;">
+            <span class="dot-indicator cyan"></span> VISUAL CONCEPT ENGINE
+          </div>
+          <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 6px;">AI Mind Map Maker</h1>
+          <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 720px;">
+            Convert lecture notes, summaries, or topics into structured visual mind maps with interactive bilateral branches.
+          </p>
+        </div>
+
+        <button id="btn-mm-toggle-input-panel" class="btn btn-secondary btn-sm">
+          Hide Input Panel ▲
+        </button>
+      </div>
+
+      <!-- Collapsible Input & Generation Panel -->
+      <div id="mm-config-panel" class="mm-config-panel glass-panel" style="padding: 24px; margin-bottom: 24px;">
+        <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 24px;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <label class="form-label" style="margin: 0; font-weight: 600;">Study Material / Lecture Notes</label>
+              <div style="display: flex; gap: 10px;">
+                <button id="btn-mm-load-demo" class="btn btn-ghost btn-sm" style="color: var(--accent-cyan); font-weight: 600;">
+                  Load Demo Notes ↗
+                </button>
+                <button id="btn-mm-clear-input" class="btn btn-ghost btn-sm" style="color: var(--text-muted);">
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              id="mm-source-text"
+              class="glass-textarea"
+              rows="6"
+              placeholder="Paste lecture text, chapter reading, or study concepts here to generate an interconnected concept map..."
+            ></textarea>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+              <span id="mm-char-count" style="font-size: 0.78rem; color: var(--text-faint);">0 / 35,000 characters</span>
+              <span style="font-size: 0.78rem; color: var(--accent-emerald);">Supports Markdown, TXT & pasted transcripts</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="margin-bottom: 16px;">
+                <label class="form-label">Subject or Central Topic (Optional)</label>
+                <input
+                  type="text"
+                  id="mm-topic-input"
+                  class="glass-input"
+                  placeholder="e.g. Water Conservation, Neural Networks, Macroeconomics"
+                >
+              </div>
+
+              <div style="margin-bottom: 16px;">
+                <label class="form-label">Hierarchy Depth</label>
+                <select id="mm-depth-select" class="glass-select">
+                  <option value="2">2 Levels (Concise Core Ideas)</option>
+                  <option value="3" selected>3 Levels (Standard Concept Map)</option>
+                  <option value="4">4 Levels (In-Depth Technical Tree)</option>
+                </select>
+              </div>
+
+              <input type="file" id="mm-file-input" style="display: none;" accept=".txt,.md,.docx,.pdf">
+              <div class="dropzone" id="mm-dropzone" style="padding: 16px;">
+                <div style="font-size: 1.2rem;">📄</div>
+                <div style="font-weight: 600; color: #fff; font-size: 0.88rem;">Drop document to extract text</div>
+                <div style="font-size: 0.75rem; color: var(--text-faint); margin-top: 2px;">Supports .txt and .md files</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 18px;">
+              <button id="btn-generate-mindmap" class="btn btn-primary" style="width: 100%; height: 46px; font-size: 1rem; font-weight: 700;">
+                Generate Mind Map ✦
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Visual Mind Map Canvas Stage -->
+      <div id="mindmap-canvas-container" class="mindmap-canvas-container">
+        <!-- Floating Left Tool Dock -->
+        <div class="mindmap-left-dock" role="toolbar" aria-label="Mind Map Controls">
+          <button id="btn-mm-recenter" class="mm-dock-btn" title="Fit to View / Recenter (F)">⛶</button>
+          <div class="mm-dock-divider"></div>
+          <button id="btn-mm-zoom-in" class="mm-dock-btn" title="Zoom In (+)">⊕</button>
+          <button id="btn-mm-zoom-out" class="mm-dock-btn" title="Zoom Out (-)">⊖</button>
+          <button id="btn-mm-zoom-reset" class="mm-dock-btn" title="Reset Zoom (100%)">⟲</button>
+          <div class="mm-dock-divider"></div>
+          <button id="btn-mm-toggle-all" class="mm-dock-btn" title="Expand/Collapse Subtrees">🗖</button>
+          <button id="btn-mm-fullscreen" class="mm-dock-btn" title="Toggle Fullscreen Canvas">⛶</button>
+        </div>
+
+        <!-- Floating Top Bar -->
+        <div class="mindmap-top-bar">
+          <div class="mm-top-pill">
+            <span style="font-size: 1.1rem;">🕸</span>
+            <div>
+              <div id="mm-title-header" style="font-weight: 700; color: #fff; font-size: 0.95rem;">Interactive Mind Map</div>
+              <div style="font-size: 0.72rem; color: var(--text-faint);">Drag to pan • Scroll to zoom • Click node to inspect</div>
+            </div>
+            <span id="mm-node-count-badge" class="badge badge-purple" style="margin-left: 6px;">0 Concepts</span>
+          </div>
+
+          <div class="mm-actions-group">
+            <button id="btn-mm-regenerate" class="btn btn-secondary btn-sm" title="Regenerate with AI">
+              <span>⟳</span> Regenerate
+            </button>
+
+            <button id="btn-mm-save" class="btn btn-primary btn-sm" title="Save to My Study Library">
+              <span>💾</span> Save Map
+            </button>
+
+            <div class="nav-dropdown">
+              <button class="btn btn-secondary btn-sm" data-dropdown-toggle="dropdown-export-menu">
+                <span>📥</span> Export ▼
+              </button>
+              <div id="dropdown-export-menu" class="dropdown-menu right-aligned" style="width: 200px;">
+                <button id="btn-mm-export-png" class="dropdown-item"><span>🖼</span> High-Res PNG</button>
+                <button id="btn-mm-export-svg" class="dropdown-item"><span>📐</span> Scalable Vector SVG</button>
+                <button id="btn-mm-export-json" class="dropdown-item"><span>📋</span> Tree JSON Data</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty Canvas State -->
+        <div id="mm-empty-state" class="mm-canvas-overlay">
+          <div style="width: 64px; height: 64px; border-radius: 16px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 18px; color: var(--accent-cyan);">
+            🕸
+          </div>
+          <h2 style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Your visual mind map will generate here.</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 440px; margin-bottom: 24px;">
+            Paste study notes above or load the sample text, then click <strong>Generate Mind Map</strong> to synthesize a radial concept map.
+          </p>
+          <div style="display: flex; gap: 12px;">
+            <button onclick="document.getElementById('btn-mm-load-demo').click(); document.getElementById('btn-generate-mindmap').click();" class="btn btn-primary">
+              Load & Generate Sample Map ↗
+            </button>
+            <a href="library.html?type=mindmap" class="btn btn-secondary">
+              Browse Saved Maps
+            </a>
+          </div>
+        </div>
+
+        <!-- Loading State Overlay -->
+        <div id="mm-loading-state" class="mm-canvas-overlay" style="display: none;">
+          <div class="animate-spin" style="width: 52px; height: 52px; border-radius: 50%; border: 3px solid rgba(99, 102, 241, 0.2); border-top-color: var(--accent-cyan); margin-bottom: 20px;"></div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 6px;">✨ Synthesizing Visual Mind Map...</h3>
+          <p id="mm-loading-step-text" style="font-size: 0.9rem; color: var(--accent-cyan);">Analyzing study notes & key hierarchies...</p>
+        </div>
+
+        <!-- Interactive SVG Canvas Surface -->
+        <svg id="mindmap-svg" class="mindmap-svg">
+          <g id="mindmap-viewport" class="mindmap-viewport"></g>
+        </svg>
+
+        <!-- Concept Detail Inspector Drawer -->
+        <div id="mm-inspector-panel" class="mm-inspector-panel" role="dialog" aria-labelledby="mm-inspect-title">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span id="mm-inspect-depth" class="badge badge-cyan" style="font-size: 0.72rem;">Concept</span>
+            <button id="btn-mm-close-inspector" class="btn btn-ghost btn-sm" style="padding: 2px 6px; color: var(--text-faint);">✕</button>
+          </div>
+          <h3 id="mm-inspect-title" style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Concept Details</h3>
+          <p id="mm-inspect-notes" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; max-height: 160px; overflow-y: auto;">
+            Explore details, formulas, and connections for this branch.
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-ghost btn-sm" style="color: var(--accent-cyan); font-size: 0.78rem;" onclick="navigator.clipboard?.writeText(document.getElementById('mm-inspect-title').textContent); showToast('Concept copied!', 'success');">
+              📋 Copy Concept
+            </button>
+          </div>
+        </div>
+
+        <!-- Zoom Level Indicator Badge -->
+        <div id="mm-zoom-level" class="mm-zoom-badge">100%</div>
+      </div>
+    </main>
+  </div>
+
+    <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/mindmap.js"></script>
+</body>
+</html>

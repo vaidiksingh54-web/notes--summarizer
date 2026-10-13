@@ -1,0 +1,12 @@
+$kind: collection
+description: Full API test suite for the CogniStudy AI Study Assistant backend.
+auth:
+  type: bearer
+  credentials:
+    token: "{{authToken}}"
+variables:
+  baseUrl: http://127.0.0.1:5000
+  authToken: ""
+  itemId: ""
+  activityId: ""
+  testEmail: ""
