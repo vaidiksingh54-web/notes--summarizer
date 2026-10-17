@@ -34,6 +34,13 @@ function currentPage() {
   return (window.location.pathname.split("/").pop() || "index.html").toLowerCase();
 }
 
+function getApiBaseUrl() {
+  if (typeof window !== "undefined" && window.location && window.location.port && window.location.port !== "3000" && window.location.port !== "5000" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+    return "http://localhost:3000";
+  }
+  return "";
+}
+
 if (!PUBLIC_PAGES.has(currentPage()) && !localStorage.getItem(TOKEN_KEY)) {
   window.location.replace("login.html");
 }
@@ -89,29 +96,56 @@ class StudyStore {
 
   async onFirebaseAuthUser(user) {
     this.firebaseUser = user;
-    let firestoreProfile = null;
-    if (window.firebaseService) {
+    let token = this.getToken();
+    let profile = null;
+
+    // Exchange with backend /api/auth/google to establish a persistent session
+    if (!token || token.startsWith("firebase_")) {
       try {
-        firestoreProfile = await window.firebaseService.getProfile();
+        const authRes = await this.request("/api/auth/google", {
+          method: "POST",
+          body: JSON.stringify({
+            email: user.email || "",
+            name: user.displayName || user.email?.split("@")[0] || "Student",
+            uid: user.uid
+          })
+        });
+        if (authRes && authRes.token) {
+          token = authRes.token;
+          profile = authRes.profile;
+        }
       } catch (err) {
-        console.warn("Could not load Firestore profile:", err);
+        console.warn("Backend Google auth exchange fallback:", err);
+        token = `firebase_${user.uid}`;
       }
     }
-    const profile = firestoreProfile || {
-      id: user.uid,
-      name: user.displayName || user.email?.split("@")[0] || "Student",
-      email: user.email || "",
-      phone: user.phoneNumber || "",
-      college: "",
-      course: "",
-      age: 18,
-      bio: "Google Verified Student",
-      avatar: (user.displayName || "S").slice(0, 2).toUpperCase(),
-      isLoggedIn: true
-    };
-    this.setSession(`firebase_${user.uid}`, profile);
 
-    // Sync items from Firestore
+    if (!profile) {
+      let firestoreProfile = null;
+      if (window.firebaseService) {
+        try {
+          firestoreProfile = await window.firebaseService.getProfile();
+        } catch (err) {
+          console.warn("Could not load Firestore profile:", err);
+        }
+      }
+      profile = firestoreProfile || {
+        id: user.uid,
+        name: user.displayName || user.email?.split("@")[0] || "Student",
+        email: user.email || "",
+        phone: user.phoneNumber || "",
+        college: "",
+        course: "",
+        age: 18,
+        bio: "Google Verified Student",
+        avatar: (user.displayName || "S").slice(0, 2).toUpperCase(),
+        isLoggedIn: true
+      };
+    }
+
+    this.setSession(token, profile);
+
+    // Sync items from Firestore if available
     if (window.firebaseService) {
       try {
         const firestoreItems = await window.firebaseService.listItems();
@@ -136,6 +170,8 @@ class StudyStore {
         console.warn("Could not load Firestore activities:", err);
       }
     }
+
+    await this.loadFromApi();
     window.dispatchEvent(new CustomEvent("store-data-updated"));
   }
 
@@ -147,17 +183,6 @@ class StudyStore {
     const token = this.getToken();
     if (!token) return;
 
-    if (token.startsWith("firebase_")) {
-      if (window.firebaseService) {
-        const current = window.firebaseService.getCurrentUser();
-        if (current) {
-          await this.onFirebaseAuthUser(current);
-          return;
-        }
-      }
-      return;
-    }
-
     try {
       const data = await this.request("/api/bootstrap");
       this.user = { ...EMPTY_USER, ...data.profile, isLoggedIn: true };
@@ -165,7 +190,7 @@ class StudyStore {
       this.notifications = data.notifications;
       this.activities = data.activities;
     } catch (error) {
-      if (String(error.message).includes("Sign in")) {
+      if (String(error.message).includes("Sign in") || String(error.message).includes("UNAUTHENTICATED")) {
         localStorage.removeItem(TOKEN_KEY);
         if (!PUBLIC_PAGES.has(currentPage())) window.location.replace("login.html");
         return;
@@ -179,14 +204,24 @@ class StudyStore {
 
   async request(path, options = {}) {
     const token = this.getToken();
-    const response = await fetch(path, {
-      ...options,
-      headers: {
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options.headers
+    const url = path.startsWith("http") ? path : `${getApiBaseUrl()}${path}`;
+    let response;
+    try {
+      response = await fetch(url, {
+        ...options,
+        headers: {
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...options.headers
+        }
+      });
+    } catch (networkErr) {
+      if (getApiBaseUrl()) {
+        throw new Error("Cannot connect to CogniStudy backend at http://localhost:3000. Start the server with `npm run dev`.");
       }
-    });
+      throw networkErr;
+    }
+
     if (response.status === 204) return null;
     const data = await response.json().catch(() => ({}));
     if (response.status === 401 && !PUBLIC_PAGES.has(currentPage())) {
@@ -255,7 +290,7 @@ class StudyStore {
     const exists = this.items.some(existing => existing.id === item.id);
     let saved = item;
     const token = this.getToken();
-    if (token && !token.startsWith("firebase_")) {
+    if (token) {
       try {
         const result = await this.request(exists ? `/api/items/${encodeURIComponent(item.id)}` : "/api/items", {
           method: exists ? "PUT" : "POST",
@@ -285,7 +320,7 @@ class StudyStore {
 
   async deleteItem(id) {
     const token = this.getToken();
-    if (token && !token.startsWith("firebase_")) {
+    if (token) {
       try {
         await this.request(`/api/items/${encodeURIComponent(id)}`, { method: "DELETE" });
       } catch (err) {
@@ -307,7 +342,7 @@ class StudyStore {
     if (!item) throw new Error("Study item was not found.");
     const newStatus = !item.isFavorite;
     const token = this.getToken();
-    if (token && !token.startsWith("firebase_")) {
+    if (token) {
       try {
         const result = await this.request(`/api/items/${encodeURIComponent(id)}/favorite`, {
           method: "PATCH",
@@ -367,7 +402,7 @@ class StudyStore {
   async addActivity(activity) {
     let saved = activity;
     const token = this.getToken();
-    if (token && !token.startsWith("firebase_")) {
+    if (token) {
       try {
         const result = await this.request("/api/activities", {
           method: "POST",
@@ -400,7 +435,7 @@ class StudyStore {
 
   async saveProfile(profile) {
     const token = this.getToken();
-    if (token && !token.startsWith("firebase_")) {
+    if (token) {
       try {
         const result = await this.request("/api/profile", {
           method: "PUT",

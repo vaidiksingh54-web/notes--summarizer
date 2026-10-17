@@ -9,26 +9,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   checkUrlParamsForEdit();
 });
 
-const DEMO_ACADEMIC_NOTES = `Photosynthesis & Cellular Energy Transduction
-
-Photosynthesis is the fundamental biological process by which autotrophic organisms (plants, algae, and cyanobacteria) convert solar photons into chemical energy stored within covalent bonds of carbohydrates.
-
-1. Light-Dependent Reactions (Thylakoid Membrane):
-Photons strike photosystem II (P680), photoexciting electrons that journey along the electron transport chain (ETC). Water photolysis generates molecular oxygen (O2) and protons. Chemiosmotic ATP synthase uses the proton gradient to generate ATP, alongside NADPH formation via photosystem I (P700).
-
-2. Light-Independent Reactions (Calvin Cycle - Stroma):
-Carbon fixation is catalyzed by Ribulose-1,5-bisphosphate carboxylase-oxygenase (RuBisCO), incorporating atmospheric CO2 into 3-phosphoglycerate (3-PGA). Subsequent reduction and RuBP regeneration cycles synthesize glucose (C6H12O6).
-
-Key Equation:
-6 CO2 + 6 H2O + Light Energy -> C6H12O6 + 6 O2
-
-Cellular Respiration Coupling:
-The resulting carbohydrates undergo glycolysis, the Krebs cycle, and oxidative phosphorylation in the mitochondria to produce approximately 30-32 net ATP molecules per glucose molecule.`;
+function escapeHtml(str) {
+  if (typeof str !== "string") return "";
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
 
 function initNotesGenerator() {
   const notesTextarea = document.getElementById("notes-source-input");
   const charCounter = document.getElementById("char-count");
-  const loadDemoBtn = document.getElementById("btn-load-demo-notes");
   const clearBtn = document.getElementById("btn-clear-notes");
   const generateBtn = document.getElementById("btn-generate-notes");
   const fileInput = document.getElementById("doc-file-input");
@@ -41,14 +31,6 @@ function initNotesGenerator() {
     const len = notesTextarea.value.length;
     if (charCounter) charCounter.textContent = `${len.toLocaleString()} / 25,000 characters`;
   });
-
-  if (loadDemoBtn) {
-    loadDemoBtn.addEventListener("click", () => {
-      notesTextarea.value = DEMO_ACADEMIC_NOTES;
-      notesTextarea.dispatchEvent(new Event("input"));
-      window.showToast("Loaded academic sample notes!", "info");
-    });
-  }
 
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
@@ -191,7 +173,7 @@ async function extractTextFromPdf(file) {
     generateBtn.addEventListener("click", async () => {
       const content = notesTextarea.value.trim();
       if (!content) {
-        window.showToast("Please enter notes or click 'Load Demo Notes' first.", "error");
+        window.showToast("Please enter study notes or upload a document first.", "error");
         notesTextarea.focus();
         return;
       }

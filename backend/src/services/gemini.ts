@@ -47,7 +47,13 @@ export class GeminiStudyAi implements StudyAi {
   private async generateText(prompt: string, responseMimeType?: string): Promise<string> {
     const key = this.requireKey();
     const client = this.createClient(key);
-    const candidateModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"];
+    const candidateModels = [
+      process.env.GEMINI_MODEL,
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-1.5-flash",
+      "gemini-2.0-flash",
+    ].filter(Boolean) as string[];
     let lastError: unknown;
 
     for (const model of candidateModels) {

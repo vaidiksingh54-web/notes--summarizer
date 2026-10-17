@@ -5,17 +5,13 @@ import path from "node:path";
 import { SqliteRepository } from "../src/repository/sqliteRepository.js";
 import type { Profile, StudyItem } from "../src/types.js";
 
-test("SqliteRepository supports persistence, demo seed, and full CRUD", () => {
+test("SqliteRepository starts clean and supports persistence and full CRUD", () => {
   const tmpDbPath = path.resolve(process.cwd(), `backend/test_study_${Date.now()}.db`);
   try {
     const repo1 = new SqliteRepository(tmpDbPath);
 
-    // 1. Verify demo student is seeded
-    const demo = repo1.findStudentByEmail("demo@cognistudy.ai");
-    assert.ok(demo, "Demo student should be seeded");
-    assert.equal(demo.profile.name, "Alex Chen");
-    const demoItems = repo1.listItems(demo.id);
-    assert.ok(demoItems.length >= 2, "Demo student should have notes and mind map");
+    // 1. Verify fresh database starts clean with no hardcoded demo accounts or items
+    assert.equal(repo1.findStudentByEmail("demo@cognistudy.ai"), undefined);
 
     // 2. Create student
     const profile: Profile = {

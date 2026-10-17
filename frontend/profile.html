@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
   <div class="ambient-glow-top-right"></div>
@@ -222,11 +222,11 @@
             </div>
 
             <div class="glass-card" style="padding: 24px; text-align: center;">
-              <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Storage Persistence</h3>
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Account Session</h3>
               <p style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 16px;">
-                Accounts are managed in server memory for development. Data is preserved during session.
+                Your account data and notes are securely stored. Click below to sign out of this device.
               </p>
-              <button id="btn-end-demo-session" class="btn btn-ghost btn-sm" style="color: #fb7185;">
+              <button id="btn-profile-signout" class="btn btn-ghost btn-sm" style="color: #fb7185;">
                 Sign Out
               </button>
             </div>
@@ -280,9 +280,9 @@
     </div>
   </div>
 
-    <script type="module" src="/js/firebase.js"></script>
-  <script src="/js/store.js"></script>
-  <script src="/js/app.js"></script>
-  <script src="/js/profile.js"></script>
+    <script type="module" src="js/firebase.bundle.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/profile.js"></script>
 </body>
 </html>

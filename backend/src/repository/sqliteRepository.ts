@@ -27,7 +27,6 @@ export class SqliteRepository implements Repository {
     }
     this.db = new DatabaseSync(resolvedPath);
     this.initTables();
-    this.seedDemoStudent();
   }
 
   private initTables(): void {
@@ -76,123 +75,6 @@ export class SqliteRepository implements Repository {
       CREATE INDEX IF NOT EXISTS idx_activities_student ON activities (student_id);
       CREATE INDEX IF NOT EXISTS idx_notifications_student ON notifications (student_id);
     `);
-  }
-
-  private seedDemoStudent(): void {
-    const existing = this.db.prepare("SELECT id FROM students WHERE email = ?").get("demo@cognistudy.ai");
-    if (existing) return;
-
-    const id = "student-demo-001";
-    const email = "demo@cognistudy.ai";
-    const passwordHash = "0123456789abcdef0123456789abcdef:3fa6557216112ba000b4c441cc1777857516d2d8f2e20f965a56181d1adf8295d1885848490f6ed1c2cb1b9457424374b7a236dfb92ed69c293f7ed002172661";
-    const profile: Profile = {
-      name: "Alex Chen",
-      email,
-      phone: "+1 555-0199",
-      college: "Stanford University",
-      course: "Computer Science & Cognitive Psychology",
-      age: 21,
-      bio: "Undergraduate researcher focused on educational AI, neural systems, and distributed workflows.",
-      avatar: "AC",
-    };
-
-    this.db.prepare(
-      "INSERT INTO students (id, email, password_hash, profile) VALUES (?, ?, ?, ?)"
-    ).run(id, email, passwordHash, JSON.stringify(profile));
-
-    const note1: StudyItem = {
-      id: "note-demo-1",
-      type: "note",
-      title: "Cellular Respiration & ATP Synthesis",
-      category: "Biology",
-      date: "Today",
-      progress: 100,
-      isFavorite: true,
-      tags: ["Biology", "Metabolism", "ATP"],
-      content: "<h2>Cellular Respiration Overview</h2><p>Cellular respiration is a metabolic pathway that breaks down glucose and produces ATP.</p><h3>Key Stages</h3><ul><li><strong>Glycolysis:</strong> Cytoplasm, generates 2 net ATP.</li><li><strong>Citric Acid Cycle:</strong> Mitochondrial matrix.</li><li><strong>Oxidative Phosphorylation:</strong> Electron transport chain producing the bulk of cellular ATP.</li></ul>",
-    };
-
-    const mindmap1: StudyItem = {
-      id: "mindmap-demo-1",
-      type: "mindmap",
-      title: "Water Conservation & Resource Management",
-      category: "Environmental Science",
-      date: "Today",
-      progress: 100,
-      isFavorite: true,
-      tags: ["Ecology", "Conservation", "Mind Map"],
-      nodeCount: 16,
-      rootNode: {
-        id: "root-water",
-        title: "Water Conservation",
-        notes: "Fundamental strategies for sustainable freshwater management.",
-        color: "#818cf8",
-        children: [
-          {
-            id: "node-scarcity",
-            title: "Causes of Scarcity",
-            color: "#f97316",
-            children: [
-              { id: "node-ind-waste", title: "Industrial Pollution", children: [] },
-              { id: "node-agri-runoff", title: "Agricultural Runoffs", children: [] },
-              { id: "node-overconsumption", title: "Irresponsible Consumption", children: [] }
-            ]
-          },
-          {
-            id: "node-prevention",
-            title: "Mitigation & Prevention",
-            color: "#ec4899",
-            children: [
-              { id: "node-rainwater", title: "Rainwater Harvesting", children: [] },
-              { id: "node-civic-infra", title: "Civic Infrastructure", children: [] },
-              { id: "node-awareness", title: "Community Education", children: [] }
-            ]
-          },
-          {
-            id: "node-domestic",
-            title: "Daily Domestic Practices",
-            color: "#38bdf8",
-            children: [
-              { id: "node-leak-repairs", title: "Plumbing Leak Repairs", children: [] },
-              { id: "node-aerators", title: "Shower Aerators & Restrictors", children: [] },
-              { id: "node-full-loads", title: "Full Dishwasher Loads", children: [] }
-            ]
-          }
-        ]
-      }
-    };
-
-    this.createItem(id, note1);
-    this.createItem(id, mindmap1);
-
-    this.addActivity(id, {
-      id: "act-1",
-      title: "Generated Mind Map: Water Conservation",
-      type: "Mind Map",
-      score: "Complete",
-      date: "Today",
-      icon: "🕸"
-    });
-
-    this.addActivity(id, {
-      id: "act-2",
-      title: "Summarized: Cellular Respiration",
-      type: "Note",
-      score: "Complete",
-      date: "Today",
-      icon: "📝"
-    });
-
-    this.db.prepare(
-      "INSERT INTO notifications (id, student_id, title, message, time, read, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)"
-    ).run(
-      "notif-1",
-      id,
-      "Welcome to CogniStudy AI",
-      "Your AI study assistant with Mind Map Maker, Summarizer, and Flashcards is active.",
-      "Just now",
-      Date.now()
-    );
   }
 
   createStudent(email: string, passwordHash: string, profile: Profile): PublicStudent {

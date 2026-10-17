@@ -256,28 +256,32 @@ export function parseGeneratedMindMap(value: unknown): MindMapNode {
 
 export function parseStudyItem(value: unknown): StudyItem {
   const input = requireObject(value);
-  const id = stringField(input.id, "id", { required: true, max: 100 })!;
-  if (!/^[A-Za-z0-9_-]+$/.test(id)) {
-    throw new ApiError(400, "INVALID_FIELD", "id may contain only letters, numbers, underscores, and hyphens.");
-  }
   const type = input.type;
   if (type !== "note" && type !== "flashcards" && type !== "quiz" && type !== "mindmap") {
     throw new ApiError(400, "INVALID_FIELD", "type must be note, flashcards, quiz, or mindmap.");
+  }
+  const rawId = typeof input.id === "string" && input.id.trim().length > 0
+    ? input.id.trim()
+    : `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  const id = stringField(rawId, "id", { required: true, max: 100 })!;
+  if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+    throw new ApiError(400, "INVALID_FIELD", "id may contain only letters, numbers, underscores, and hyphens.");
   }
   const item: StudyItem = {
     id,
     type,
     title: stringField(input.title, "title", { required: true, max: 200 })!,
-    category: stringField(input.category, "category", { required: true, max: 100 })!,
-    date: stringField(input.date, "date", { required: true, max: 80 })!,
-    progress: numberField(input.progress, "progress", 0, 100),
-    isFavorite: typeof input.isFavorite === "boolean"
-      ? input.isFavorite
-      : (() => { throw new ApiError(400, "INVALID_FIELD", "isFavorite must be a boolean."); })(),
+    category: stringField(input.category ?? "General", "category", { required: true, max: 100 })!,
+    date: stringField(input.date ?? new Date().toLocaleDateString(), "date", { required: true, max: 80 })!,
+    progress: numberField(input.progress ?? 0, "progress", 0, 100),
+    isFavorite: typeof input.isFavorite === "boolean" ? input.isFavorite : false,
   };
 
   if (type === "note") {
-    item.content = stringField(input.content, "content", { required: true, max: 100_000 })!;
+    const rawContent = typeof input.content === "object" && input.content !== null
+      ? (typeof (input.content as { text?: unknown }).text === "string" ? (input.content as { text: string }).text : JSON.stringify(input.content))
+      : input.content;
+    item.content = stringField(rawContent, "content", { required: true, max: 100_000 })!;
     if (input.tags !== undefined) {
       if (!Array.isArray(input.tags) || input.tags.length > 30 ||
           input.tags.some((tag) => typeof tag !== "string" || tag.length > 50)) {

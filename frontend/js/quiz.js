@@ -8,63 +8,7 @@ let userAnswers = {}; // { 0: 2, 1: 0, ... }
 let timerInterval = null;
 let secondsElapsed = 0;
 
-const DEFAULT_SAMPLE_QUIZ = [
-  {
-    question: "What does the abbreviation CPU stand for in computer systems?",
-    options: [
-      "Central Processing Unit",
-      "Computer Processing User",
-      "Central Program Utility",
-      "Control Processing Unit"
-    ],
-    correct: 0,
-    explanation: "CPU stands for Central Processing Unit. It is the primary hardware component executing program instructions and orchestrating arithmetic logic operations."
-  },
-  {
-    question: "Which cellular organelle is the specialized site for photosynthetic light reactions?",
-    options: [
-      "Mitochondrial Matrix",
-      "Thylakoid Membrane of Chloroplasts",
-      "Rough Endoplasmic Reticulum",
-      "Golgi Apparatus Cisternae"
-    ],
-    correct: 1,
-    explanation: "Light-dependent reactions take place across the thylakoid membranes inside chloroplasts where photosystems I and II absorb photons."
-  },
-  {
-    question: "Which of the following Boolean logic gates is classified as a 'Universal Gate'?",
-    options: [
-      "XOR Gate",
-      "AND Gate",
-      "NAND Gate",
-      "OR Gate"
-    ],
-    correct: 2,
-    explanation: "NAND and NOR gates are universal gates because any combinational logic circuit can be implemented entirely using either NAND or NOR gates alone."
-  },
-  {
-    question: "In C programming, which library function is used to free dynamically allocated heap memory?",
-    options: [
-      "delete()",
-      "dispose()",
-      "clear()",
-      "free()"
-    ],
-    correct: 3,
-    explanation: "The free() function in <stdlib.h> releases dynamic memory previously allocated via malloc(), calloc(), or realloc()."
-  },
-  {
-    question: "According to De Morgan's Laws of Boolean algebra, what is the equivalent of (A + B)̅?",
-    options: [
-      "A̅ · B̅",
-      "A̅ + B̅",
-      "A · B",
-      "(A · B)̅"
-    ],
-    correct: 0,
-    explanation: "De Morgan's second law asserts that the complement of a logical sum equals the logical product of individual complements: (A + B)̅ = A̅ · B̅."
-  }
-];
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   initQuizGenerator();

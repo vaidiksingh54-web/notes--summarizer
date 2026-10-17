@@ -10,10 +10,24 @@ let pendingRenameId = null;
 document.addEventListener("DOMContentLoaded", async () => {
   await window.store.ready;
   initLibraryTabs();
+  checkUrlParamsForTab();
   initLibrarySearch();
   initModalsLibrary();
   renderLibraryCards();
 });
+
+function checkUrlParamsForTab() {
+  const params = new URLSearchParams(window.location.search);
+  let filter = (params.get("filter") || params.get("type") || "").toLowerCase();
+  if (filter === "notes") filter = "note";
+  if (filter === "quizzes") filter = "quiz";
+  if (["all", "note", "flashcards", "quiz", "mindmap", "favorites"].includes(filter)) {
+    activeLibraryTab = filter;
+    document.querySelectorAll("[data-lib-tab]").forEach(tab => {
+      tab.classList.toggle("active", tab.getAttribute("data-lib-tab") === filter);
+    });
+  }
+}
 
 function initLibraryTabs() {
   document.querySelectorAll("[data-lib-tab]").forEach(tab => {

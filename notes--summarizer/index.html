@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NoteWise AI — a futuristic frontend prototype that turns lengthy study notes into clear summaries, flashcards, and interactive quizzes.">
+  <title>NoteWise AI — Smart Summaries & Quiz Generator for Focused Learning</title>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient visual elements -->
+  <div class="site-noise" aria-hidden="true"></div>
+  <div class="background-orb orb-one" aria-hidden="true"></div>
+  <div class="background-orb orb-two" aria-hidden="true"></div>
+  <div class="background-grid" aria-hidden="true"></div>
+
+  <!-- Main Site Header -->
+  <header class="site-header" id="top">
+    <div class="container nav-wrap">
+      <a class="brand" href="#home" aria-label="NoteWise AI home">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span>NoteWise <strong>AI</strong></span>
+      </a>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mainNav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Main Navigation Menu -->
+      <nav class="main-nav" id="mainNav" aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#summarizer">Summarizer</a>
+        <a href="#quiz-generator">Quiz Generator</a>
+        <a href="#about">About</a>
+        <button class="profile-trigger" id="authTrigger" type="button" aria-haspopup="dialog">
+          <span class="profile-avatar" id="navAvatar">↗</span>
+          <span id="authTriggerText">Sign in</span>
+        </button>
+        <a class="button button-small nav-cta" href="#summarizer">Start Summarizing <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero section" id="home">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot"></span> Next-Gen AI Learning Assistant</p>
+          <h1>Turn lengthy notes into <span class="gradient-text">clear summaries & quizzes.</span></h1>
+          <p class="hero-lead">
+            Make every study hour count. NoteWise AI transforms dense academic lectures, readings, and textbooks into concise, structured insights and interactive self-testing quizzes.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="#summarizer">Start Summarizing <span aria-hidden="true">↗</span></a>
+            <a class="button button-ghost" href="#quiz-generator">Try Quiz Generator <span aria-hidden="true">✦</span></a>
+            <a class="button button-ghost" href="#features">Explore Features <span aria-hidden="true">↓</span></a>
+          </div>
+          <p class="prototype-note">
+            <span aria-hidden="true">✦</span> Frontend prototype — Simulated AI summaries and local question bank. No external API key required.
+          </p>
+        </div>
+
+        <!-- 3D Futuristic Hero Visual -->
+        <div class="hero-visual" aria-label="Illustration of notes being processed into a smart summary">
+          <div class="visual-halo"></div>
+          <div class="visual-card notes-card">
+            <div class="visual-card-top">
+              <span class="mini-icon purple">≡</span>
+              <span>Original Notes</span>
+              <span class="card-dots">•••</span>
+            </div>
+            <div class="note-lines">
+              <i></i><i></i><i class="short"></i><i></i><i class="medium"></i>
+            </div>
+            <div class="note-tag">BIOLOGY · CHAPTER 04</div>
+          </div>
+
+          <div class="process-line">
+            <span></span>
+            <b>AI PROCESSING</b>
+            <span></span>
+          </div>
+
+          <div class="visual-card summary-card">
+            <div class="visual-card-top">
+              <span class="mini-icon cyan">✦</span>
+              <span>Smart Summary & Quiz</span>
+              <span class="sparkle">✧</span>
+            </div>
+            <div class="summary-highlight"></div>
+            <p>Photosynthesis converts light energy into chemical energy inside chloroplasts...</p>
+            <div class="summary-pills">
+              <span>Key insight</span>
+              <span>Quiz Ready</span>
+              <span>3 min read</span>
+            </div>
+          </div>
+
+          <span class="float-shape shape-ring" aria-hidden="true"></span>
+          <span class="float-shape shape-cube" aria-hidden="true">✦</span>
+        </div>
+      </div>
+      <div class="scroll-cue" aria-hidden="true">
+        <span></span> Scroll to explore
+      </div>
+    </section>
+
+    <!-- ==================== STATS SECTION ==================== -->
+    <section class="stats-section">
+      <div class="container stats-grid">
+        <div class="stat">
+          <strong>10K<span>+</span></strong>
+          <span>Notes Summarized</span>
+        </div>
+        <div class="stat">
+          <strong>95<span>%</span></strong>
+          <span>Time Saved</span>
+        </div>
+        <div class="stat">
+          <strong>4.9<span>/5</span></strong>
+          <span>Student Rating</span>
+        </div>
+        <div class="stat">
+          <strong>24<span>/7</span></strong>
+          <span>Study Support</span>
+        </div>
+      </div>
+      <p class="demo-disclaimer">Illustrative project statistics for demonstration purposes</p>
+    </section>
+
+    <!-- ==================== FEATURES SECTION ==================== -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Everything you need to learn smarter</p>
+            <h2>Built for your <span class="gradient-text">best study flow.</span></h2>
+          </div>
+          <p>From quick text uploads to exam preparation quizzes, every detail is engineered to make complex material effortless.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-icon">✦</span>
+            <h3>AI-powered summarization</h3>
+            <p>Condense complex academic literature into clear, actionable study points.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">?</span>
+            <h3>AI Quiz Generator</h3>
+            <p>Automatically turn any pasted lecture or summary into multiple-choice test quizzes.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">◒</span>
+            <h3>Flexible summary styles</h3>
+            <p>Choose Short, Medium, or Detailed lengths with Paragraph or Bullet formats.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">↥</span>
+            <h3>Browser text file reader</h3>
+            <p>Drag and drop .txt and .md files directly to load notes instantly without uploading.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">☷</span>
+            <h3>Key terms & takeaways</h3>
+            <p>Spot essential terminology, definitions, and high-yield concepts at a glance.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">⌘</span>
+            <h3>Copy & download</h3>
+            <p>Export polished summaries as plain text files or copy directly to clipboard.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">☺</span>
+            <h3>Private student profile</h3>
+            <p>Manage your academic profile and review study streaks in a secure demo dashboard.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">⌁</span>
+            <h3>Responsive by design</h3>
+            <p>Optimized for mobile phones, tablets, laptops, and ultra-wide desktop monitors.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WORKFLOW SECTION ==================== -->
+    <section class="section workflow-section" id="how-it-works">
+      <div class="container">
+        <div class="center-heading">
+          <p class="eyebrow">A clearer path to mastery</p>
+          <h2>Three steps. <span class="gradient-text">Less overwhelm.</span></h2>
+          <p>Go from a wall of text to a confident, exam-ready study plan in a few focused moments.</p>
+        </div>
+        <div class="workflow-grid">
+          <article class="step-card">
+            <div class="step-number">01</div>
+            <span class="step-icon">↥</span>
+            <h3>Paste or drop your notes</h3>
+            <p>Paste text directly into the editor or drop a .txt/.md file right from your device.</p>
+          </article>
+          <article class="step-card">
+            <div class="step-number">02</div>
+            <span class="step-icon">☷</span>
+            <h3>Choose your study style</h3>
+            <p>Select summary length and format, or set quiz question count and target difficulty.</p>
+          </article>
+          <article class="step-card">
+            <div class="step-number">03</div>
+            <span class="step-icon">✦</span>
+            <h3>Review summary & test yourself</h3>
+            <p>Read key takeaways, download your notes, and take the interactive quiz to test retention.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SUMMARIZER SECTION ==================== -->
+    <section class="section summarizer-section" id="summarizer">
+      <div class="container">
+        <div class="center-heading">
+          <p class="eyebrow">Your focused study workspace</p>
+          <h2>Summarize with <span class="gradient-text">NoteWise AI.</span></h2>
+          <p>Try the interactive frontend demo below. Notes remain in your browser memory.</p>
+        </div>
+
+        <div class="summarizer-panel">
+          <!-- Input Column -->
+          <div class="input-panel panel-column">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">01 / INPUT</span>
+                <h3>Your Notes</h3>
+              </div>
+              <span class="live-badge"><i></i> Ready</span>
+            </div>
+
+            <!-- Inline Alert Message Area -->
+            <div class="inline-msg" id="summarizerMsg" role="alert" hidden></div>
+
+            <label class="sr-only" for="notesInput">Paste your notes</label>
+            <textarea id="notesInput" maxlength="12000" placeholder="Paste your study notes here or click 'Load Demo Notes' to see NoteWise AI in action..."></textarea>
+            
+            <div class="input-meta">
+              <span id="charCount">0 / 12,000 characters</span>
+              <button class="text-button" id="loadDemo" type="button">Load Demo Notes <span>↗</span></button>
+            </div>
+
+            <!-- File Drop Area (Reads .txt and .md in browser; PDF/DOCX notice) -->
+            <label class="file-drop" for="fileInput" id="fileDropLabel">
+              <span class="upload-symbol">↑</span>
+              <strong>Drag & drop a file or browse</strong>
+              <span>Supports .txt & .md in browser (PDF/DOCX simulated)</span>
+              <em id="fileName">Browse from your device</em>
+            </label>
+            <input id="fileInput" type="file" accept=".txt,.md,.pdf,.docx">
+
+            <!-- Summary Style Selection -->
+            <div class="options-block">
+              <div class="option-group">
+                <span class="option-label">Summary length</span>
+                <div class="segmented" role="group" aria-label="Summary length">
+                  <button class="option active" type="button" data-group="length" data-value="short">Short</button>
+                  <button class="option" type="button" data-group="length" data-value="medium">Medium</button>
+                  <button class="option" type="button" data-group="length" data-value="detailed">Detailed</button>
+                </div>
+              </div>
+              <div class="option-group">
+                <span class="option-label">Summary format</span>
+                <div class="segmented" role="group" aria-label="Summary format">
+                  <button class="option active" type="button" data-group="format" data-value="paragraphs">Paragraphs</button>
+                  <button class="option" type="button" data-group="format" data-value="bullets">Bullet Points</button>
+                  <button class="option" type="button" data-group="format" data-value="keypoints">Key Points</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-buttons-row">
+              <button class="button generate-button" id="generateBtn" type="button">
+                Generate Summary <span>✦</span>
+              </button>
+              <button class="button button-ghost" id="clearNotesBtn" type="button" title="Clear notes input">
+                Clear
+              </button>
+            </div>
+
+            <p class="prototype-label">Demo mode · Uses simulated summary templates. No external AI API connected.</p>
+          </div>
+
+          <!-- Output Column -->
+          <div class="output-panel panel-column">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">02 / OUTPUT</span>
+                <h3>AI Summary</h3>
+              </div>
+              <span class="ai-badge">✦ DEMO</span>
+            </div>
+
+            <div class="output-content" id="outputContent">
+              <!-- Empty State -->
+              <div class="empty-state" id="emptyState">
+                <span class="empty-orb">✦</span>
+                <h4>Your generated summary will appear here.</h4>
+                <p>Paste some notes and click <strong>Generate Summary</strong> to view the structured takeaways.</p>
+              </div>
+
+              <!-- Loading State -->
+              <div class="loading-state" id="loadingState" hidden>
+                <span class="loader"></span>
+                <h4 id="loadingText">Analyzing notes...</h4>
+                <p>Preparing demo summary view</p>
+              </div>
+
+              <!-- Summary Result Content -->
+              <article class="summary-result" id="summaryResult" hidden>
+                <div class="result-top">
+                  <span class="result-tag">GENERATED SUMMARY</span>
+                  <span id="readTime">3 MIN READ</span>
+                </div>
+                <h4 id="summaryTitle">Photosynthesis & Energy Conversion</h4>
+                <div id="summaryBody"></div>
+
+                <div class="result-section">
+                  <h5><span>✦</span> Key points</h5>
+                  <ul id="keyPoints"></ul>
+                </div>
+
+                <div class="result-section terms">
+                  <h5><span>⌕</span> Important terms</h5>
+                  <div id="importantTerms" class="term-list"></div>
+                </div>
+
+                <div class="result-section action-box">
+                  <h5><span>✓</span> Suggested Action Items</h5>
+                  <ul id="actionItems" class="action-list">
+                    <li>Review light-dependent reactions before next lecture.</li>
+                    <li>Quiz yourself on chloroplast structure using the Quiz Generator below.</li>
+                  </ul>
+                </div>
+              </article>
+            </div>
+
+            <!-- Output Action Buttons -->
+            <div class="output-actions" id="outputActions" hidden>
+              <button class="button button-small" id="copyBtn" type="button" title="Copy text to clipboard">
+                Copy <span>⌘</span>
+              </button>
+              <button class="icon-button" id="downloadBtn" type="button" aria-label="Download summary as text" title="Download text">
+                ↓
+              </button>
+              <button class="button button-small button-violet" id="sendToQuizBtn" type="button" title="Send notes to Quiz Generator">
+                Send to Quiz <span>?</span>
+              </button>
+              <button class="icon-button" id="regenerateBtn" type="button" aria-label="Regenerate summary" title="Regenerate">
+                ↻
+              </button>
+              <button class="clear-button" id="clearBtn" type="button" title="Clear output">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== QUIZ GENERATOR SECTION ==================== -->
+    <section class="section quiz-section" id="quiz-generator">
+      <div class="container">
+        <div class="center-heading">
+          <p class="eyebrow">Interactive Knowledge Testing</p>
+          <h2>Generate Quizzes with <span class="gradient-text">NoteWise AI.</span></h2>
+          <p>Transform any study notes into multiple-choice self-assessments to solidify your understanding.</p>
+        </div>
+
+        <div class="quiz-panel summarizer-panel">
+          <!-- Quiz Setup / Input Panel -->
+          <div class="input-panel panel-column">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">01 / QUIZ SETUP</span>
+                <h3>Quiz Material</h3>
+              </div>
+              <span class="live-badge"><i></i> Interactive</span>
+            </div>
+
+            <!-- Inline Alert Message Area for Quiz -->
+            <div class="inline-msg" id="quizMsg" role="alert" hidden></div>
+
+            <label class="sr-only" for="quizNotesInput">Paste notes for quiz generation</label>
+            <textarea id="quizNotesInput" maxlength="12000" placeholder="Paste your study notes here or click 'Use Summarizer Notes' / 'Load Sample Notes' to generate practice questions..."></textarea>
+
+            <div class="input-meta">
+              <span id="quizCharCount">0 / 12,000 characters</span>
+              <div class="input-meta-actions">
+                <button class="text-button" id="useSummarizerNotes" type="button">Use Summarizer Notes <span>↑</span></button>
+                <button class="text-button" id="loadQuizDemo" type="button">Load Sample <span>↗</span></button>
+              </div>
+            </div>
+
+            <!-- Quiz Configuration Options -->
+            <div class="options-block">
+              <div class="option-group">
+                <span class="option-label">Number of questions</span>
+                <div class="segmented" role="group" aria-label="Question count">
+                  <button class="quiz-option active" type="button" data-group="quiz-count" data-value="3">3 Questions</button>
+                  <button class="quiz-option" type="button" data-group="quiz-count" data-value="5">5 Questions</button>
+                  <button class="quiz-option" type="button" data-group="quiz-count" data-value="10">10 Questions</button>
+                </div>
+              </div>
+              <div class="option-group">
+                <span class="option-label">Difficulty level</span>
+                <div class="segmented" role="group" aria-label="Quiz difficulty">
+                  <button class="quiz-option active" type="button" data-group="quiz-diff" data-value="easy">Easy</button>
+                  <button class="quiz-option" type="button" data-group="quiz-diff" data-value="medium">Medium</button>
+                  <button class="quiz-option" type="button" data-group="quiz-diff" data-value="hard">Hard</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-buttons-row">
+              <button class="button generate-button" id="generateQuizBtn" type="button">
+                Generate Quiz <span>?</span>
+              </button>
+              <button class="button button-ghost" id="clearQuizInputBtn" type="button" title="Clear quiz notes">
+                Clear
+              </button>
+            </div>
+
+            <p class="prototype-label">Demo mode · Generates interactive quizzes from our curated local question bank. No AI API connected.</p>
+          </div>
+
+          <!-- Quiz Interactive Arena / Output Panel -->
+          <div class="output-panel panel-column">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">02 / QUIZ ARENA</span>
+                <h3 id="quizArenaHeading">Practice Quiz</h3>
+              </div>
+              <span class="ai-badge" id="quizStatusBadge">✦ DEMO</span>
+            </div>
+
+            <div class="output-content quiz-output-content" id="quizOutputContent">
+              <!-- Empty State -->
+              <div class="empty-state" id="quizEmptyState">
+                <span class="empty-orb">?</span>
+                <h4>Your interactive quiz will appear here.</h4>
+                <p>Paste notes or load sample content, configure your question count and difficulty, then click <strong>Generate Quiz</strong>.</p>
+              </div>
+
+              <!-- Loading State -->
+              <div class="loading-state" id="quizLoadingState" hidden>
+                <span class="loader"></span>
+                <h4 id="quizLoadingText">Formulating questions...</h4>
+                <p>Building interactive questions from your material</p>
+              </div>
+
+              <!-- Active Quiz Runner -->
+              <div class="quiz-runner" id="quizRunner" hidden>
+                <div class="quiz-runner-header">
+                  <div class="quiz-meta-info">
+                    <span class="quiz-step-tag" id="quizProgressText">Question 1 of 3</span>
+                    <span class="quiz-diff-tag" id="quizDiffTag">Medium</span>
+                  </div>
+                  <div class="quiz-progress-bar-wrap">
+                    <div class="quiz-progress-bar" id="quizProgressBar" style="width: 33%"></div>
+                  </div>
+                </div>
+
+                <div class="quiz-question-box">
+                  <h4 class="quiz-question-title" id="quizQuestionText">Question text goes here?</h4>
+                </div>
+
+                <div class="quiz-options-list" id="quizOptionsList" role="radiogroup" aria-label="Quiz choices">
+                  <!-- Generated dynamically -->
+                </div>
+
+                <div class="quiz-navigation-controls">
+                  <button class="button button-ghost" id="quizPrevBtn" type="button">
+                    ← Previous
+                  </button>
+                  <button class="button button-ghost" id="quizNextBtn" type="button">
+                    Next →
+                  </button>
+                  <button class="button" id="quizSubmitBtn" type="button">
+                    Submit Quiz <span>✦</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quiz Results / Score State -->
+              <div class="quiz-score-state" id="quizScoreResult" hidden>
+                <div class="score-card">
+                  <div class="score-ring-wrap">
+                    <div class="score-badge" id="quizScoreBadge">
+                      <strong id="quizScorePercent">100%</strong>
+                      <span id="quizScoreFraction">3 / 3 Correct</span>
+                    </div>
+                  </div>
+                  <h4 id="quizScoreTitle">Outstanding Work!</h4>
+                  <p id="quizScoreMessage">You have grasped the core principles covered in this material.</p>
+                </div>
+
+                <div class="quiz-review-section">
+                  <div class="review-header">
+                    <h5><span>✦</span> Question Review & Explanations</h5>
+                  </div>
+                  <div class="review-list" id="quizReviewList">
+                    <!-- Detailed question breakdown inserted here -->
+                  </div>
+                </div>
+
+                <div class="quiz-result-actions">
+                  <button class="button" id="quizRetakeBtn" type="button">
+                    Retake Quiz <span>↻</span>
+                  </button>
+                  <button class="button button-ghost" id="quizNewBtn" type="button">
+                    Generate New Quiz <span>✦</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <section class="section about-section" id="about">
+      <div class="container about-grid">
+        <div>
+          <p class="eyebrow">The philosophy behind NoteWise AI</p>
+          <h2>Make studying feel <span class="gradient-text">lighter & smarter.</span></h2>
+          <p class="about-lead">
+            NoteWise AI is built around a single, student-centered objective: eliminate the mental fatigue of reading endless unorganized notes, transforming them into high-retention summaries and practice tests.
+          </p>
+        </div>
+        <div class="about-details">
+          <div>
+            <span>Project objective</span>
+            <strong>Transform dense lecture notes into bite-sized summaries and active recall quizzes.</strong>
+          </div>
+          <div>
+            <span>Target users</span>
+            <strong>College and high school students preparing for exams, tests, and seminars.</strong>
+          </div>
+          <div>
+            <span>Key benefits</span>
+            <strong>Saves study time · Enhances recall · Simulates exam scenarios · Keeps notes organized.</strong>
+          </div>
+          <div>
+            <span>Technology status</span>
+            <strong>Current version: Vanilla HTML, CSS, and JavaScript frontend prototype.</strong>
+          </div>
+        </div>
+      </div>
+      <div class="container future-note">
+        <span aria-hidden="true">✦</span>
+        <p>
+          <strong>Future Product Roadmap:</strong> Real cloud authentication (Firebase Auth), database persistence (Cloud Firestore), and live AI inference (Gemini API) will be integrated in the backend phase.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== FAQ SECTION ==================== -->
+    <section class="section faq-section" id="faq">
+      <div class="container faq-grid">
+        <div>
+          <p class="eyebrow">Frequently asked questions</p>
+          <h2>Good to <span class="gradient-text">know.</span></h2>
+          <p>Everything you need to know about the NoteWise AI frontend prototype.</p>
+        </div>
+        <div class="faq-list">
+          <details open>
+            <summary>What is NoteWise AI? <span>+</span></summary>
+            <p>NoteWise AI is a frontend prototype designed to streamline revision by turning complex notes into structured summaries and interactive quizzes.</p>
+          </details>
+          <details>
+            <summary>How does the Quiz Generator work? <span>+</span></summary>
+            <p>In this prototype, the Quiz Generator analyzes topic keywords from your pasted notes and generates targeted multiple-choice questions from an internal question bank with score calculation and answer explanations.</p>
+          </details>
+          <details>
+            <summary>Which file formats are supported? <span>+</span></summary>
+            <p>You can drop real .txt and .md files into the Summarizer, and they will be read immediately in your browser via the HTML5 FileReader API. PDF and DOCX formats will be processed server-side via pdf-parse and Mammoth in the upcoming backend release.</p>
+          </details>
+          <details>
+            <summary>Is my data stored securely online? <span>+</span></summary>
+            <p>This prototype runs strictly in your browser. Demo profile information and notes are stored locally in temporary browser memory and localStorage. No credentials or notes leave your computer.</p>
+          </details>
+          <details>
+            <summary>Is this connected to a live AI API? <span>+</span></summary>
+            <p>Not yet. This is an honest frontend prototype showcasing user workflows, layout, animations, and interactive testing. A secure backend with Gemini AI integration is scheduled for the next phase.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== SITE FOOTER ==================== -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand" href="#top">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span>NoteWise <strong>AI</strong></span>
+        </a>
+        <p>Clarity for every study session. Smart summaries and interactive quizzes.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#summarizer">Summarizer</a>
+        <a href="#quiz-generator">Quiz Generator</a>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <a href="#about">About NoteWise AI</a>
+        <a href="#faq">FAQ</a>
+        <span>College Project Prototype</span>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <span>hello@notewise.demo</span>
+        <span>Academic Prototype Demonstration</span>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2026 NoteWise AI. Frontend prototype for academic demonstration.</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <!-- ==================== AUTH MODAL (DEMO) ==================== -->
+  <div class="modal-backdrop" id="authModal" hidden>
+    <section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <button class="modal-close" id="authClose" type="button" aria-label="Close sign in dialog">×</button>
+      <div class="auth-brand">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span>NoteWise <strong>AI</strong></span>
+      </div>
+      <p class="eyebrow">Your personal study space</p>
+      <h2 id="authTitle">Welcome back.</h2>
+      <p class="modal-intro">
+        Sign in to manage your study preferences. This frontend prototype simulates authentication locally without sending data to an external server.
+      </p>
+      
+      <div class="auth-tabs" role="tablist" aria-label="Account options">
+        <button class="auth-tab active" type="button" data-auth-mode="login">Sign in</button>
+        <button class="auth-tab" type="button" data-auth-mode="signup">Create account</button>
+      </div>
+
+      <form id="authForm">
+        <label for="authName" id="authNameLabel" hidden>Full name</label>
+        <input id="authName" type="text" placeholder="Alex Rivera" autocomplete="name" hidden>
+
+        <label for="authEmail">Email address</label>
+        <input id="authEmail" type="email" placeholder="demo@example.com" autocomplete="email" required>
+
+        <label for="authPassword">Password</label>
+        <div class="password-field">
+          <input id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" id="passwordToggle" aria-label="Show password">Show</button>
+        </div>
+
+        <div class="auth-form-row">
+          <label class="check-label">
+            <input type="checkbox" checked> <span>Remember in this browser</span>
+          </label>
+          <button class="text-button" type="button" id="forgotPassword">Forgot password?</button>
+        </div>
+
+        <button class="button auth-submit" type="submit" id="authSubmit">
+          Sign in to NoteWise <span>↗</span>
+        </button>
+      </form>
+
+      <p class="prototype-label">Frontend demo · Real authentication requires Firebase Authentication in backend phase.</p>
+    </section>
+  </div>
+
+  <!-- ==================== USER PROFILE DASHBOARD MODAL ==================== -->
+  <div class="modal-backdrop" id="profileModal" hidden>
+    <section class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <button class="modal-close" id="profileClose" type="button" aria-label="Close profile dashboard">×</button>
+      
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <div class="large-avatar" id="profileAvatarDisplay">AR</div>
+        <div>
+          <span class="panel-kicker">PRIVATE STUDENT PROFILE</span>
+          <h2 id="profileTitle">Alex Rivera</h2>
+          <p id="profileHeaderMeta">demo@example.com · Demo University</p>
+        </div>
+        <span class="profile-status"><i></i> Demo Profile</span>
+      </div>
+
+      <div class="profile-privacy-notice">
+        <span class="notice-icon">🔒</span>
+        <p>
+          <strong>Privacy Rule:</strong> These details are private user-profile information. They are stored only in your local browser state and are never displayed publicly on the main website or in URLs.
+        </p>
+      </div>
+
+      <!-- Profile Stat Highlights -->
+      <div class="profile-grid">
+        <div class="profile-stat">
+          <strong id="statNotesCount">24</strong>
+          <span>Notes summarized</span>
+        </div>
+        <div class="profile-stat">
+          <strong id="statQuizCount">12</strong>
+          <span>Quizzes completed</span>
+        </div>
+        <div class="profile-stat">
+          <strong id="statAvgScore">92%</strong>
+          <span>Average score</span>
+        </div>
+        <div class="profile-stat">
+          <strong id="statStreak">7</strong>
+          <span>Day study streak</span>
+        </div>
+      </div>
+
+      <!-- VIEW MODE: User Profile Information Display -->
+      <div id="profileViewMode" class="profile-details-card">
+        <div class="profile-section-heading">
+          <h3>Personal & Academic Details</h3>
+          <button class="button button-small button-edit" id="editProfileBtn" type="button">
+            Edit Profile <span>✎</span>
+          </button>
+        </div>
+
+        <div class="profile-info-grid">
+          <div class="info-item">
+            <span class="info-label">Full Name</span>
+            <strong class="info-value" id="viewName">Alex Rivera</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email Address</span>
+            <strong class="info-value" id="viewEmail">demo@example.com</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Mobile Number</span>
+            <strong class="info-value" id="viewMobile">+1 (555) 019-2834</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Age</span>
+            <strong class="info-value" id="viewAge">21</strong>
+          </div>
+          <div class="info-item full-width">
+            <span class="info-label">Address</span>
+            <strong class="info-value" id="viewAddress">124 Innovation Way, Tech District, CA</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">College / Institution</span>
+            <strong class="info-value" id="viewCollege">Demo University</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Course / Program</span>
+            <strong class="info-value" id="viewCourse">B.Tech Computer Science</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Year / Semester</span>
+            <strong class="info-value" id="viewSemester">3rd Year (Semester 6)</strong>
+          </div>
+          <div class="info-item full-width">
+            <span class="info-label">Study Goals / Bio</span>
+            <strong class="info-value" id="viewBio">Focusing on Artificial Intelligence, distributed computing, and rapid exam preparation.</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT MODE: Edit Form (Hidden by default) -->
+      <form id="profileEditMode" class="profile-edit-form" hidden>
+        <div class="profile-section-heading">
+          <h3>Edit Profile Information</h3>
+          <span class="form-mode-badge">Editing Demo Profile</span>
+        </div>
+
+        <div class="edit-fields-grid">
+          <div class="edit-field">
+            <label for="editName">Full Name</label>
+            <input type="text" id="editName" required>
+          </div>
+          <div class="edit-field">
+            <label for="editEmail">Email Address</label>
+            <input type="email" id="editEmail" required>
+          </div>
+          <div class="edit-field">
+            <label for="editMobile">Mobile Number</label>
+            <input type="tel" id="editMobile">
+          </div>
+          <div class="edit-field">
+            <label for="editAge">Age</label>
+            <input type="number" id="editAge" min="15" max="100">
+          </div>
+          <div class="edit-field full-width">
+            <label for="editAddress">Address</label>
+            <input type="text" id="editAddress">
+          </div>
+          <div class="edit-field">
+            <label for="editCollege">College / Institution</label>
+            <input type="text" id="editCollege">
+          </div>
+          <div class="edit-field">
+            <label for="editCourse">Course / Program</label>
+            <input type="text" id="editCourse">
+          </div>
+          <div class="edit-field">
+            <label for="editSemester">Year / Semester</label>
+            <input type="text" id="editSemester">
+          </div>
+          <div class="edit-field full-width">
+            <label for="editBio">Study Goals / Bio</label>
+            <textarea id="editBio" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="edit-actions-row">
+          <button class="button" type="submit" id="saveProfileBtn">
+            Save Changes <span>✓</span>
+          </button>
+          <button class="button button-ghost" type="button" id="cancelEditBtn">
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      <!-- Quick Shortcuts & Sign Out -->
+      <div class="profile-footer-links">
+        <div class="profile-shortcuts">
+          <button class="text-button" type="button" id="profileSummarize">Open Summarizer ↗</button>
+          <button class="text-button" type="button" id="profileQuiz">Open Quiz Generator ↗</button>
+        </div>
+        <button class="button button-small button-danger" id="signOutBtn" type="button">
+          Sign out
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== ACCESSIBLE TOAST FEEDBACK ==================== -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Application Script -->
+  <script src="script.js"></script>
+</body>
+</html>

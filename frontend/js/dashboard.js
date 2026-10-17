@@ -94,6 +94,7 @@ window.openItemFromActivity = function(title, type) {
     if (match.type === "note") window.location.href = `notes.html?id=${match.id}`;
     else if (match.type === "flashcards") window.location.href = `flashcards.html?id=${match.id}`;
     else if (match.type === "quiz") window.location.href = `quiz.html?id=${match.id}`;
+    else if (match.type === "mindmap") window.location.href = `mindmap.html?id=${match.id}`;
   } else {
     window.location.href = "library.html";
   }

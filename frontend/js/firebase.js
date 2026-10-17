@@ -93,7 +93,12 @@ export const firebaseService = {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
+      let userSnap = null;
+      try {
+        userSnap = await getDoc(userRef);
+      } catch (firestoreErr) {
+        console.warn("Firestore user profile fetch warning:", firestoreErr);
+      }
 
       const profile = {
         id: user.uid,
@@ -109,11 +114,11 @@ export const firebaseService = {
         updatedAt: new Date().toISOString()
       };
 
-      if (!userSnap.exists()) {
+      if (!userSnap || !userSnap.exists()) {
         try {
           await setDoc(userRef, profile);
         } catch (err) {
-          handleFirestoreError(err, OperationType.CREATE, `users/${user.uid}`);
+          console.warn("Firestore user profile save warning:", err);
         }
       } else {
         const existingData = userSnap.data();

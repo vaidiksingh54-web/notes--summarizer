@@ -3,28 +3,7 @@
  * Bilateral radial tree layout, interactive SVG rendering, pan/zoom canvas, and export.
  */
 
-const DEMO_WATER_NOTES = `Water Conservation & Sustainable Hydrological Management
 
-1. Introduction
-Water is the fundamental life-sustaining natural resource. Conservation ensures maintaining freshwater supplies against rapidly diminishing global sources and climate variability.
-
-2. Causes of Scarcity
-Accelerating water scarcity is driven by severe environmental pollution, especially industrial waste discharge and agricultural chemical runoffs (pesticides & fertilizers). Excessive wastage and irresponsible domestic and commercial consumption severely compound the depletion.
-
-3. Prevention Methods
-Mitigation requires implementing proper civic management systems, extensive community awareness programmes, and widespread rainwater harvesting infrastructure to recharge aquifers.
-
-4. Daily Water Saving Tips
-Immediate domestic practices include:
-- Fixing leaky faucets and plumbing fixtures
-- Washing vehicles using buckets and mugs rather than running hoses
-- Installing shower flow restrictors and aerators
-- Running dishwashers and washing machines only with full loads
-- Installing dual-flush toilets to minimize volume per flush
-- Reusing vegetable washing water for house plants and garden beds
-
-5. Conclusion
-With exponential population growth and industrial expansion, water demand will continue to soar. Citizen responsibility, community stewardship, and technological water recycling are essential for ecological resilience.`;
 
 const BRANCH_COLORS = [
   "#f97316", // Warm Orange
@@ -209,7 +188,6 @@ class MindMapApp {
 
   initInputControls() {
     const generateBtn = document.getElementById("btn-generate-mindmap");
-    const loadDemoBtn = document.getElementById("btn-mm-load-demo");
     const clearBtn = document.getElementById("btn-mm-clear-input");
     const togglePanelBtn = document.getElementById("btn-mm-toggle-input-panel");
     const configPanel = document.getElementById("mm-config-panel");
@@ -223,16 +201,6 @@ class MindMapApp {
       const len = notesTextarea.value.length;
       if (charCounter) charCounter.textContent = `${len.toLocaleString()} / 35,000 characters`;
     });
-
-    if (loadDemoBtn && notesTextarea) {
-      loadDemoBtn.addEventListener("click", () => {
-        notesTextarea.value = DEMO_WATER_NOTES;
-        const topicInput = document.getElementById("mm-topic-input");
-        if (topicInput) topicInput.value = "Water Conservation";
-        notesTextarea.dispatchEvent(new Event("input"));
-        window.showToast("Loaded Water Conservation sample material!", "info");
-      });
-    }
 
     if (clearBtn && notesTextarea) {
       clearBtn.addEventListener("click", () => {

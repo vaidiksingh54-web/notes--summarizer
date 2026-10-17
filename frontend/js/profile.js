@@ -38,7 +38,8 @@ function renderProfileDetails() {
 }
 
 function initEditProfileModal() {
-  document.getElementById("btn-end-demo-session")?.addEventListener("click", () => {
+  const signoutBtn = document.getElementById("btn-profile-signout") || document.getElementById("btn-end-demo-session");
+  signoutBtn?.addEventListener("click", () => {
     window.store.logout().finally(() => {
       window.showToast("Signed out.", "info");
       setTimeout(() => {

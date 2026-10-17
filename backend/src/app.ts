@@ -24,6 +24,20 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
   const app = express();
 
   app.disable("x-powered-by");
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+    if (req.method === "OPTIONS") {
+      res.status(204).end();
+      return;
+    }
+    next();
+  });
   app.use(securityHeaders);
   app.use(express.json({ limit: "1mb", strict: true }));
 
@@ -63,14 +77,24 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
   registerItemRoutes(app, repository, requireAuth);
   registerProfileRoutes(app, repository, requireAuth);
 
-  app.get("/api/bootstrap", requireAuth, (request, response) => {
-    const studentId = studentIdOf(request);
-    response.json({
-      profile: repository.getProfile(studentId),
-      items: repository.listItems(studentId),
-      activities: repository.listActivities(studentId),
-      notifications: repository.listNotifications(studentId),
-    });
+  app.get("/api/bootstrap", requireAuth, async (request, response, next) => {
+    try {
+      const studentId = studentIdOf(request);
+      const [profile, items, activities, notifications] = await Promise.all([
+        repository.getProfile(studentId),
+        repository.listItems(studentId),
+        repository.listActivities(studentId),
+        repository.listNotifications(studentId),
+      ]);
+      response.json({
+        profile,
+        items,
+        activities,
+        notifications,
+      });
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.use("/api", (_request, _response, next) => {
