@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Notes Generator & Editor - CogniStudy AI</title>
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body>
@@ -152,11 +152,11 @@
               <button id="btn-clear-notes" class="btn btn-ghost btn-sm" style="font-size: 0.8rem; color: var(--text-muted);">Clear</button>
             </div>
 
-            <input type="file" id="doc-file-input" style="display: none;" accept=".txt,.md,.pdf,.docx">
+            <input type="file" id="doc-file-input" style="display: none;" accept=".txt,.md,.pdf">
             <div class="dropzone" id="file-dropzone">
               <div class="dropzone-icon">↑</div>
               <div style="font-weight: 600; color: #fff; font-size: 0.95rem;">Drag & drop your document or browse</div>
-              <div style="font-size: 0.8rem; color: var(--text-faint); margin-top: 4px;">Supports TXT and Markdown files for text extraction</div>
+              <div style="font-size: 0.8rem; color: var(--text-faint); margin-top: 4px;">Supports TXT, Markdown, and PDF documents for text extraction (Max 10 MB)</div>
             </div>
 
             <div id="file-preview" class="file-preview-card" style="display: none;">
@@ -240,6 +240,9 @@
               <div style="display: flex; gap: 8px;">
                 <button id="btn-save-notes" class="btn btn-primary btn-sm">
                   <span>💾</span> Save to Library
+                </button>
+                <button id="btn-copy-notes" class="btn btn-secondary btn-sm">
+                  <span>📋</span> Copy
                 </button>
                 <button id="btn-download-notes" class="btn btn-secondary btn-sm">
                   <span>📥</span> Download .txt
@@ -330,6 +333,7 @@
   </div>
 
     <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/vendor/pdf.min.js"></script>
   <script src="/js/store.js"></script>
   <script src="/js/app.js"></script>
   <script src="/js/notes.js"></script>

@@ -110,8 +110,14 @@ export interface MindMapRequest {
   depth?: number;
 }
 
+export interface SummaryOptions {
+  length?: "short" | "medium" | "comprehensive";
+  difficulty?: "beginner" | "intermediate" | "advanced";
+  style?: "detailed" | "bulleted" | "cheatsheet";
+}
+
 export interface StudyAi {
-  summarize(text: string): Promise<string>;
+  summarize(text: string, options?: SummaryOptions): Promise<string>;
   generateFlashcards(request: FlashcardRequest): Promise<Array<{ question: string; answer: string }>>;
   generateQuiz(request: QuizRequest): Promise<QuizQuestion[]>;
   chat(request: ChatRequest): Promise<string>;

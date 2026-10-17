@@ -8,7 +8,7 @@ export function registerAuthRoutes(app: Express, repository: Repository): void {
   app.post("/api/signup", async (request, response, next) => {
     try {
       const input = parseSignup(request.body);
-      if (repository.isEmailTaken(input.email)) {
+      if (await repository.isEmailTaken(input.email)) {
         throw new ApiError(409, "EMAIL_TAKEN", "An account with this email already exists.");
       }
       const profile = {
@@ -21,8 +21,9 @@ export function registerAuthRoutes(app: Express, repository: Repository): void {
         bio: `Student at ${input.college}.`,
         avatar: studentAvatar(input.name),
       };
-      const student = repository.createStudent(input.email, await hashPassword(input.password), profile);
-      response.status(201).json(authPayload(repository.createSession(student.id), student.profile));
+      const student = await repository.createStudent(input.email, await hashPassword(input.password), profile);
+      const token = await repository.createSession(student.id);
+      response.status(201).json(authPayload(token, student.profile));
     } catch (error) {
       next(error);
     }
@@ -31,24 +32,56 @@ export function registerAuthRoutes(app: Express, repository: Repository): void {
   app.post("/api/login", async (request, response, next) => {
     try {
       const input = parseLogin(request.body);
-      const student = repository.findStudentByEmail(input.email);
+      const student = await repository.findStudentByEmail(input.email);
       const valid = student ? await verifyPassword(input.password, student.passwordHash) : false;
       if (!student || !valid) {
         throw new ApiError(401, "INVALID_CREDENTIALS", "Email or password is incorrect.");
       }
-      response.json(authPayload(repository.createSession(student.id), student.profile));
+      const token = await repository.createSession(student.id);
+      response.json(authPayload(token, student.profile));
     } catch (error) {
       next(error);
     }
   });
 
-  app.post("/api/logout", (request, response, next) => {
-    const token = bearerToken(request);
-    if (!token || !repository.getStudentIdForSession(token)) {
-      next(new ApiError(401, "UNAUTHENTICATED", "Sign in with your student account to continue."));
-      return;
+  app.post("/api/auth/google", async (request, response, next) => {
+    try {
+      const email = typeof request.body?.email === "string" ? request.body.email.trim().toLowerCase() : "";
+      const name = typeof request.body?.name === "string" ? request.body.name.trim() : "Google Student";
+      const uid = typeof request.body?.uid === "string" ? request.body.uid.trim() : "";
+      if (!email || !uid) {
+        throw new ApiError(400, "INVALID_FIELDS", "email and uid are required for Google authentication.");
+      }
+      const existing = await repository.findStudentByEmail(email);
+      const student = existing ?? await repository.createStudent(email, `google-oauth-${uid}`, {
+        name,
+        email,
+        phone: "",
+        college: "Google Verified",
+        course: "General Studies",
+        age: 20,
+        bio: "Student verified via Google OAuth.",
+        avatar: studentAvatar(name),
+      });
+      const token = await repository.createSession(student.id);
+      response.json(authPayload(token, student.profile));
+    } catch (error) {
+      next(error);
     }
-    repository.deleteSession(token);
-    response.status(204).end();
+  });
+
+  app.post("/api/logout", async (request, response, next) => {
+    try {
+      const token = bearerToken(request);
+      const studentId = token ? await repository.getStudentIdForSession(token) : undefined;
+      if (!token || !studentId) {
+        next(new ApiError(401, "UNAUTHENTICATED", "Sign in with your student account to continue."));
+        return;
+      }
+      await repository.deleteSession(token);
+      response.status(204).end();
+    } catch (error) {
+      next(error);
+    }
   });
 }

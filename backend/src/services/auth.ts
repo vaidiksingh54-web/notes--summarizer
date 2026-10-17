@@ -43,15 +43,19 @@ export function studentIdOf(request: Request): string {
 }
 
 export function createRequireAuth(repository: Repository): RequestHandler {
-  return (request, _response, next) => {
-    const token = bearerToken(request);
-    const studentId = token ? repository.getStudentIdForSession(token) : undefined;
-    if (!studentId) {
-      next(new ApiError(401, "UNAUTHENTICATED", "Sign in with your student account to continue."));
-      return;
+  return async (request, _response, next) => {
+    try {
+      const token = bearerToken(request);
+      const studentId = token ? await repository.getStudentIdForSession(token) : undefined;
+      if (!studentId) {
+        next(new ApiError(401, "UNAUTHENTICATED", "Sign in with your student account to continue."));
+        return;
+      }
+      request.studentId = studentId;
+      next();
+    } catch (error) {
+      next(error);
     }
-    request.studentId = studentId;
-    next();
   };
 }
 

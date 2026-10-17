@@ -465,11 +465,6 @@ class StudyStore {
       });
       return result.mindmap;
     } catch (err) {
-      const msg = String(err?.message || "");
-      if (msg.includes("GEMINI") || msg.includes("unavailable") || msg.includes("503") || msg.includes("502") || msg.includes("Failed to fetch") || msg.includes("not found")) {
-        console.warn("Server AI offline or unconfigured, utilizing client-side semantic extractor:", err);
-        return this.synthesizeClientMindMap(topic, text, depth);
-      }
       throw err;
     }
   }

@@ -1,0 +1,81 @@
+-- ==============================================================================
+-- CogniStudy AI — Supabase SQL Database Schema
+-- Paste this script into your Supabase SQL Editor:
+-- https://supabase.com/dashboard/project/_/sql/new
+-- ==============================================================================
+
+-- 1. Students Table
+CREATE TABLE IF NOT EXISTS public.students (
+    id TEXT PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    profile JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Sessions Table
+CREATE TABLE IF NOT EXISTS public.sessions (
+    token TEXT PRIMARY KEY,
+    student_id TEXT NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    expires_at BIGINT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON public.sessions (token);
+CREATE INDEX IF NOT EXISTS idx_sessions_student ON public.sessions (student_id);
+
+-- 3. Study Items Table (Notes, Flashcards, Quizzes, Mind Maps)
+CREATE TABLE IF NOT EXISTS public.study_items (
+    id TEXT NOT NULL,
+    student_id TEXT NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    is_favorite BOOLEAN NOT NULL DEFAULT FALSE,
+    data JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    PRIMARY KEY (student_id, id)
+);
+CREATE INDEX IF NOT EXISTS idx_study_items_student ON public.study_items (student_id);
+CREATE INDEX IF NOT EXISTS idx_study_items_type ON public.study_items (type);
+
+-- 4. Activities Table (Dashboard Activity Timeline)
+CREATE TABLE IF NOT EXISTS public.activities (
+    id TEXT PRIMARY KEY,
+    student_id TEXT NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    data JSONB NOT NULL,
+    created_at BIGINT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_activities_student ON public.activities (student_id);
+
+-- 5. Notifications Table
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id TEXT PRIMARY KEY,
+    student_id TEXT NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    time TEXT NOT NULL,
+    read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at BIGINT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_student ON public.notifications (student_id);
+
+-- Enable Row Level Security (RLS) for data protection
+ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.study_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Allow full access to service_role (used securely by your backend server)
+CREATE POLICY "Service Role Access Students" ON public.students FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service Role Access Sessions" ON public.sessions FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service Role Access Study Items" ON public.study_items FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service Role Access Activities" ON public.activities FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service Role Access Notifications" ON public.notifications FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+-- Seed Initial Demo Student (Alex Chen)
+INSERT INTO public.students (id, email, password_hash, profile)
+VALUES (
+    'student-demo-001',
+    'demo@cognistudy.ai',
+    '0123456789abcdef0123456789abcdef:3fa6557216112ba000b4c441cc1777857516d2d8f2e20f965a56181d1adf8295d1885848490f6ed1c2cb1b9457424374b7a236dfb92ed69c293f7ed002172661',
+    '{"name": "Alex Chen", "email": "demo@cognistudy.ai", "phone": "+1 555-0199", "college": "Stanford University", "course": "Computer Science", "age": 21, "bio": "Undergraduate researcher focused on educational AI.", "avatar": "AC"}'::jsonb
+) ON CONFLICT (id) DO NOTHING;

@@ -40,13 +40,43 @@ export function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-export function parseSummaryText(body: unknown): string {
+export function parseSummaryRequest(body: unknown): {
+  text: string;
+  length?: "short" | "medium" | "comprehensive";
+  difficulty?: "beginner" | "intermediate" | "advanced";
+  style?: "detailed" | "bulleted" | "cheatsheet";
+} {
   const input = requireObject(body);
   const text = stringField(input.text, "text", { required: true, max: 25_000 })!;
   if (text.trim().length < 20) {
     throw new ApiError(400, "INVALID_FIELD", "text must contain at least 20 non-whitespace characters.");
   }
-  return text;
+  let length: "short" | "medium" | "comprehensive" | undefined = undefined;
+  if (input.length !== undefined) {
+    if (input.length !== "short" && input.length !== "medium" && input.length !== "comprehensive") {
+      throw new ApiError(400, "INVALID_FIELD", "length must be short, medium, or comprehensive.");
+    }
+    length = input.length;
+  }
+  let difficulty: "beginner" | "intermediate" | "advanced" | undefined = undefined;
+  if (input.difficulty !== undefined) {
+    if (input.difficulty !== "beginner" && input.difficulty !== "intermediate" && input.difficulty !== "advanced") {
+      throw new ApiError(400, "INVALID_FIELD", "difficulty must be beginner, intermediate, or advanced.");
+    }
+    difficulty = input.difficulty;
+  }
+  let style: "detailed" | "bulleted" | "cheatsheet" | undefined = undefined;
+  if (input.style !== undefined) {
+    if (input.style !== "detailed" && input.style !== "bulleted" && input.style !== "cheatsheet") {
+      throw new ApiError(400, "INVALID_FIELD", "style must be detailed, bulleted, or cheatsheet.");
+    }
+    style = input.style;
+  }
+  return { text, length, difficulty, style };
+}
+
+export function parseSummaryText(body: unknown): string {
+  return parseSummaryRequest(body).text;
 }
 
 export function parseSignup(body: unknown): {

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Mind Map Maker - CogniStudy AI</title>
   <meta name="description" content="Generate clear, visual, interactive mind maps from study notes and academic lecture material with CogniStudy AI.">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/mindmap.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/mindmap.css">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body>
@@ -193,11 +193,11 @@
                 </select>
               </div>
 
-              <input type="file" id="mm-file-input" style="display: none;" accept=".txt,.md,.docx,.pdf">
+              <input type="file" id="mm-file-input" style="display: none;" accept=".txt,.md,.pdf">
               <div class="dropzone" id="mm-dropzone" style="padding: 16px;">
                 <div style="font-size: 1.2rem;">📄</div>
                 <div style="font-weight: 600; color: #fff; font-size: 0.88rem;">Drop document to extract text</div>
-                <div style="font-size: 0.75rem; color: var(--text-faint); margin-top: 2px;">Supports .txt and .md files</div>
+                <div style="font-size: 0.75rem; color: var(--text-faint); margin-top: 2px;">Supports .txt, .md, and .pdf documents (up to 10 MB)</div>
               </div>
             </div>
 
@@ -312,6 +312,7 @@
   </div>
 
     <script type="module" src="/js/firebase.js"></script>
+  <script src="/js/vendor/pdf.min.js"></script>
   <script src="/js/store.js"></script>
   <script src="/js/app.js"></script>
   <script src="/js/mindmap.js"></script>

@@ -282,7 +282,7 @@ class MindMapApp {
     }
   }
 
-  handleFile(file) {
+  async handleFile(file) {
     const notesTextarea = document.getElementById("mm-source-text");
     const topicInput = document.getElementById("mm-topic-input");
     if (!notesTextarea) return;
@@ -291,7 +291,13 @@ class MindMapApp {
       topicInput.value = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
     }
 
-    if (file.type.includes("text") || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
+    if (file.size > 10 * 1024 * 1024) {
+      window.showToast("File is too large. Maximum supported size is 10 MB.", "error");
+      return;
+    }
+
+    const lowerName = file.name.toLowerCase();
+    if (file.type.includes("text") || lowerName.endsWith(".txt") || lowerName.endsWith(".md")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         notesTextarea.value = e.target.result;
@@ -299,10 +305,18 @@ class MindMapApp {
         window.showToast(`Imported ${file.name}`, "success");
       };
       reader.readAsText(file);
+    } else if (file.type === "application/pdf" || lowerName.endsWith(".pdf")) {
+      window.showToast(`Extracting text from ${file.name}...`, "info");
+      try {
+        const extracted = await extractTextFromPdf(file);
+        notesTextarea.value = extracted;
+        notesTextarea.dispatchEvent(new Event("input"));
+        window.showToast(`Successfully extracted text from ${file.name}!`, "success");
+      } catch (err) {
+        window.showToast(err.message || "Failed to extract text from PDF.", "error");
+      }
     } else {
-      notesTextarea.value = `[Extracted from ${file.name}]\n\n` + DEMO_WATER_NOTES;
-      notesTextarea.dispatchEvent(new Event("input"));
-      window.showToast(`Imported ${file.name}`, "success");
+      window.showToast("Direct extraction supports .txt, .md, and .pdf documents.", "error");
     }
   }
 
@@ -966,3 +980,26 @@ document.addEventListener("DOMContentLoaded", () => {
   window.mindMapApp = new MindMapApp();
   window.mindMapApp.init();
 });
+
+async function extractTextFromPdf(file) {
+  if (typeof window.pdfjsLib === "undefined") {
+    throw new Error("PDF processing library not loaded. Please refresh the page.");
+  }
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/js/vendor/pdf.worker.min.js";
+  const arrayBuffer = await file.arrayBuffer();
+  const loadingTask = window.pdfjsLib.getDocument({ data: arrayBuffer });
+  const pdf = await loadingTask.promise;
+  let fullText = "";
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map(item => item.str);
+    fullText += strings.join(" ") + "\n\n";
+  }
+  const clean = fullText.trim();
+  if (!clean) {
+    throw new Error("The PDF appears to be empty or contains only scanned images without selectable text.");
+  }
+  return clean;
+}
+

@@ -25,6 +25,19 @@ test("summary and flashcards run on the server after login", async () => {
   assert.equal(success.status, 200);
   assert.equal(success.data.summary, "Summary generated for test.");
 
+  const withOptions = await json(baseUrl, "/api/summarize", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      text: "This text is long enough to receive a sample summary with custom options.",
+      length: "comprehensive",
+      difficulty: "advanced",
+      style: "bulleted",
+    }),
+  });
+  assert.equal(withOptions.status, 200);
+  assert.equal(withOptions.data.summary, "Summary generated for test.");
+
   const invalid = await json(baseUrl, "/api/summarize", {
     method: "POST",
     headers,

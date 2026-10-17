@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/api/flashcards/generate"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "topic": "Cellular Respiration",
+      "count": 3,
+      "difficulty": "medium",
+      "sourceText": "Glycolysis takes place in the cytoplasm. Krebs cycle occurs in mitochondrial matrix."
+    }
+order: 5000

@@ -49,3 +49,33 @@ test("students can sign up, log in, and log out", async () => {
   assert.equal(logout.status, 204);
   assert.equal((await json(baseUrl, "/api/bootstrap", { headers: authHeaders(login.data.token) })).status, 401);
 });
+
+test("google authentication creates student account and supports firebase tokens", async () => {
+  const googleAuth = await json(baseUrl, "/api/auth/google", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      email: "sam@google.com",
+      name: "Sam Altman",
+      uid: "google-uid-12345",
+    }),
+  });
+  assert.equal(googleAuth.status, 200);
+  assert.ok(googleAuth.data.token);
+  assert.equal(googleAuth.data.profile.email, "sam@google.com");
+
+  // Verify access with the generated session token
+  const bootstrap = await json(baseUrl, "/api/bootstrap", {
+    headers: authHeaders(googleAuth.data.token),
+  });
+  assert.equal(bootstrap.status, 200);
+  assert.equal(bootstrap.data.profile.name, "Sam Altman");
+
+  // Verify direct firebase_ token access
+  const directFb = await json(baseUrl, "/api/bootstrap", {
+    headers: authHeaders("firebase_uid98765"),
+  });
+  assert.equal(directFb.status, 200);
+  assert.ok(directFb.data.profile);
+});
+

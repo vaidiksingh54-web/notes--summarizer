@@ -12,13 +12,17 @@
     "preview": "vite preview",
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "lint": "tsc --noEmit",
-    "test": "tsx --test backend/test/auth.test.ts backend/test/items.test.ts backend/test/ai.test.ts backend/test/profile.test.ts"
+    "test": "tsx --test backend/test/auth.test.ts backend/test/items.test.ts backend/test/ai.test.ts backend/test/profile.test.ts backend/test/database.test.ts backend/test/security.test.ts",
+    "db:status": "node scripts/db-status.mjs",
+    "db:reset": "node scripts/db-status.mjs --reset"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
+    "@supabase/supabase-js": "^2.117.3",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "firebase": "^13.0.0",
+    "pdfjs-dist": "^3.11.174",
     "vite": "^8.3.0"
   },
   "devDependencies": {

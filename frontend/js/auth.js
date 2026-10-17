@@ -28,8 +28,22 @@ function initGoogleAuth() {
         throw new Error("Firebase auth service is still loading. Please try again in a moment.");
       }
       const { user, profile } = await window.firebaseService.signInWithGoogle();
+      let sessionToken = `firebase_${user.uid}`;
+      let sessionProfile = profile;
       if (window.store) {
-        window.store.setSession(`firebase_${user.uid}`, profile);
+        try {
+          const backendAuth = await window.store.request("/api/auth/google", {
+            method: "POST",
+            body: JSON.stringify({ email: user.email, name: profile.name, uid: user.uid }),
+          });
+          if (backendAuth && backendAuth.token) {
+            sessionToken = backendAuth.token;
+            sessionProfile = backendAuth.profile;
+          }
+        } catch (_err) {
+          // If backend sync fails, continue with local firebase_ token
+        }
+        window.store.setSession(sessionToken, sessionProfile);
         if (typeof window.store.onFirebaseAuthUser === "function") {
           await window.store.onFirebaseAuthUser(user);
         }

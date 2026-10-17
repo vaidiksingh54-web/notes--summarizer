@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/signup"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Student Tester",
+      "email": "test.student@university.edu",
+      "password": "StudyHard2026!",
+      "college": "MIT",
+      "course": "Computer Science",
+      "phone": "+1 555-0199"
+    }
+order: 3000

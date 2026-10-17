@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/ai/transform"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "text": "TCP uses a three-way handshake: SYN, SYN-ACK, ACK. UDP is connectionless and does not guarantee packet delivery.",
+      "action": "bullets"
+    }
+order: 9000

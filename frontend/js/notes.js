@@ -86,7 +86,58 @@ function initNotesGenerator() {
     });
   }
 
-  function handleSelectedFile(file) {
+if (window.pdfjsLib) {
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/js/vendor/pdf.worker.min.js";
+}
+
+function renderMarkdownToHtml(markdown) {
+  if (!markdown) return "";
+  const html = markdown
+    .replace(/^### (.*$)/gim, '<h4 style="color:#38bdf8; margin:12px 0 6px;">$1</h4>')
+    .replace(/^## (.*$)/gim, '<h3 style="color:#fff; margin:16px 0 8px;">$1</h3>')
+    .replace(/^# (.*$)/gim, '<h2 style="color:#fff; margin:20px 0 10px;">$1</h2>')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong style="color:#fff;">$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    .replace(/^\s*[-•*]\s+(.*)$/gim, '<li style="margin-left:18px; margin-bottom:4px;">$1</li>')
+    .replace(/(<li>.*<\/li>)/gims, '<ul style="margin:8px 0; padding-left:14px;">$1</ul>')
+    .replace(/<\/ul>\s*<ul[^>]*>/gim, '')
+    .replace(/\n\n+/g, '</p><p style="margin-top:10px; line-height:1.6;">')
+    .replace(/\n/g, '<br>');
+
+  return `<p style="line-height:1.6;">${html}</p>`;
+}
+
+async function extractTextFromPdf(file) {
+  if (!window.pdfjsLib) {
+    throw new Error("PDF processing engine is loading. Please try again.");
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const numPages = pdf.numPages;
+  const pageTexts = [];
+
+  for (let i = 1; i <= numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map((item) => item.str).join(" ");
+    if (strings.trim()) {
+      pageTexts.push(`--- Page ${i} ---\n${strings.trim()}`);
+    }
+  }
+
+  const result = pageTexts.join("\n\n").trim();
+  if (!result) {
+    throw new Error("No readable text found in this PDF. It may contain scanned images. Please copy-paste your notes directly.");
+  }
+  return result;
+}
+
+  async function handleSelectedFile(file) {
+    if (file.size > 10 * 1024 * 1024) {
+      window.showToast("File exceeds the 10 MB limit. Please upload a smaller document.", "error");
+      return;
+    }
+
     if (filePreview) {
       document.getElementById("preview-file-name").textContent = file.name;
       const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
@@ -94,18 +145,28 @@ function initNotesGenerator() {
       filePreview.style.display = "flex";
     }
 
-    if (file.type.includes("text") || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
+    const lowerName = file.name.toLowerCase();
+    if (file.type.includes("text") || lowerName.endsWith(".txt") || lowerName.endsWith(".md")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         notesTextarea.value = e.target.result;
         notesTextarea.dispatchEvent(new Event("input"));
+        window.showToast(`Imported ${file.name}`, "success");
       };
       reader.readAsText(file);
+    } else if (file.type === "application/pdf" || lowerName.endsWith(".pdf")) {
+      window.showToast(`Extracting text from ${file.name}...`, "info");
+      try {
+        const extracted = await extractTextFromPdf(file);
+        notesTextarea.value = extracted;
+        notesTextarea.dispatchEvent(new Event("input"));
+        window.showToast(`Successfully extracted text from ${file.name}!`, "success");
+      } catch (err) {
+        window.showToast(err.message || "Failed to extract text from PDF.", "error");
+      }
     } else {
-      notesTextarea.value = `[Extracted from ${file.name}]\n\n` + DEMO_ACADEMIC_NOTES;
-      notesTextarea.dispatchEvent(new Event("input"));
+      window.showToast("Direct extraction supports .txt, .md, and .pdf documents.", "error");
     }
-    window.showToast(`Imported ${file.name}`, "success");
   }
 
   const removeFileBtn = document.getElementById("btn-remove-file");
@@ -159,11 +220,20 @@ function initNotesGenerator() {
         }
       }, 450);
 
+      const lengthVal = document.getElementById("option-length")?.value || "medium";
+      const difficultyVal = document.getElementById("option-difficulty")?.value || "intermediate";
+      const styleVal = document.getElementById("option-style")?.value || "detailed";
+
       generateBtn.disabled = true;
       try {
         const data = await window.store.request("/api/summarize", {
           method: "POST",
-          body: JSON.stringify({ text: content })
+          body: JSON.stringify({
+            text: content,
+            length: lengthVal,
+            difficulty: difficultyVal,
+            style: styleVal
+          })
         });
 
         clearInterval(stepInterval);
@@ -174,9 +244,7 @@ function initNotesGenerator() {
           const editorEl = document.getElementById("notes-editor-content");
           if (titleEl) titleEl.textContent = "AI Summary";
           if (editorEl) {
-            const summary = document.createElement("p");
-            summary.textContent = data.summary;
-            editorEl.replaceChildren(Object.assign(document.createElement("h2"), { textContent: "Summary" }), summary);
+            editorEl.innerHTML = renderMarkdownToHtml(data.summary);
           }
         }
         window.showToast("Summary generated.", "success");
@@ -283,6 +351,26 @@ function initNotesEditor() {
         window.showToast(error.message || "Unable to save notes.", "error");
       } finally {
         saveBtn.disabled = false;
+      }
+    });
+  }
+
+  const copyBtn = document.getElementById("btn-copy-notes");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      const textContent = editorEl.innerText;
+      if (!textContent || !textContent.trim()) {
+        window.showToast("No summary content to copy.", "error");
+        return;
+      }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textContent).then(() => {
+          window.showToast("Summary copied to clipboard!", "success");
+        }).catch(() => {
+          window.showToast("Failed to copy summary.", "error");
+        });
+      } else {
+        window.showToast("Clipboard not supported in this browser.", "error");
       }
     });
   }

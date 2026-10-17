@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/summarize"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "text": "Mitochondria generate most of the chemical energy needed to power the cells biochemical reactions. Chemical energy produced by the mitochondria is stored in adenosine triphosphate (ATP)."
+    }
+order: 4000

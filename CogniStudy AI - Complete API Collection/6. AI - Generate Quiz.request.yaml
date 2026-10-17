@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/api/quiz/generate"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "topic": "Operating Systems - Deadlocks",
+      "count": 3,
+      "difficulty": "hard",
+      "sourceText": "The 4 conditions for deadlock are mutual exclusion, hold and wait, no preemption, and circular wait."
+    }
+order: 6000

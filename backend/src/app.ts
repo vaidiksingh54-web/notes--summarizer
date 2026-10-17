@@ -3,6 +3,7 @@ import path from "node:path";
 import { ApiError, type StudyAi } from "./types.js";
 import { GeminiStudyAi } from "./services/gemini.js";
 import { InMemoryRepository } from "./repository/databaseRepository.js";
+import { SqliteRepository } from "./repository/sqliteRepository.js";
 import type { Repository } from "./repository/repository.js";
 import { createRequireAuth, studentIdOf } from "./services/auth.js";
 import { registerAiRoutes } from "./routes/ai.js";
@@ -10,20 +11,48 @@ import { registerAuthRoutes } from "./routes/auth.js";
 import { registerItemRoutes } from "./routes/items.js";
 import { registerProfileRoutes } from "./routes/profile.js";
 
+import { securityHeaders, createRateLimiter } from "./middleware/security.js";
+
 export function createApp(options: { repository?: Repository; ai?: StudyAi } = {}) {
-  const repository = options.repository ?? new InMemoryRepository();
+  const repository = options.repository ?? (
+    process.env.STORAGE_TYPE === "in-memory"
+      ? new InMemoryRepository()
+      : new SqliteRepository()
+  );
   const ai = options.ai ?? new GeminiStudyAi();
   const requireAuth = createRequireAuth(repository);
   const app = express();
 
   app.disable("x-powered-by");
+  app.use(securityHeaders);
   app.use(express.json({ limit: "1mb", strict: true }));
+
+  const authLimiter = createRateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 30,
+    message: "Too many authentication attempts. Please try again later.",
+    skipInTests: true,
+  });
+  app.use("/api/login", authLimiter);
+  app.use("/api/signup", authLimiter);
+
+  const aiLimiter = createRateLimiter({
+    windowMs: 60 * 1000,
+    max: 40,
+    message: "AI rate limit reached. Please wait a minute before generating more content.",
+    skipInTests: true,
+  });
+  app.use(
+    ["/api/summarize", "/api/flashcards/generate", "/api/quiz/generate", "/api/mindmap", "/api/mindmap/generate", "/api/ai/chat", "/api/ai/transform"],
+    aiLimiter,
+  );
 
   app.get("/api/health", (_request, response) => {
     const key = process.env.GEMINI_API_KEY?.trim();
+    const isInMemory = repository instanceof InMemoryRepository;
     response.json({
       status: "ok",
-      storage: "in-memory-per-student",
+      storage: isInMemory ? "in-memory-per-student" : "sqlite-persistent",
       auth: "student-accounts",
       geminiConfigured: Boolean(key && key !== "YOUR_GEMINI_API_KEY" && key !== "MY_GEMINI_API_KEY"),
     });

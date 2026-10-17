@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/ai/chat"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "message": "Can you give me an active recall question about binary search trees?",
+      "context": "Data structures and algorithms."
+    }
+order: 8000

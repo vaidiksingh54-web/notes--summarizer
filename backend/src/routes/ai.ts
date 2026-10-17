@@ -1,11 +1,12 @@
 import type { Express, RequestHandler } from "express";
 import type { StudyAi } from "../types.js";
-import { parseChatRequest, parseFlashcardRequest, parseMindMapRequest, parseQuizRequest, parseSummaryText, parseTransformRequest } from "../validation.js";
+import { parseChatRequest, parseFlashcardRequest, parseMindMapRequest, parseQuizRequest, parseSummaryRequest, parseTransformRequest } from "../validation.js";
 
 export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: RequestHandler): void {
   app.post("/api/summarize", requireAuth, async (request, response, next) => {
     try {
-      response.json({ summary: await ai.summarize(parseSummaryText(request.body)) });
+      const { text, length, difficulty, style } = parseSummaryRequest(request.body);
+      response.json({ summary: await ai.summarize(text, { length, difficulty, style }) });
     } catch (error) {
       next(error);
     }

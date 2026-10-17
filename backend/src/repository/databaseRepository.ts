@@ -181,6 +181,32 @@ export class InMemoryRepository implements Repository {
   }
 
   getStudentIdForSession(token: string): string | undefined {
+    if (token.startsWith("firebase_")) {
+      const firebaseUid = token.slice(9).trim();
+      if (firebaseUid.length > 0) {
+        const studentId = `student-fb-${firebaseUid.slice(0, 32)}`;
+        if (!this.studentsById.has(studentId)) {
+          const profile: Profile = {
+            name: "Google Student",
+            email: `student-${firebaseUid.slice(0, 8)}@google.com`,
+            phone: "",
+            college: "Google Auth",
+            course: "General Studies",
+            age: 20,
+            bio: "Google Verified Student",
+            avatar: "GS",
+          };
+          this.studentsById.set(studentId, {
+            id: studentId,
+            email: profile.email,
+            passwordHash: `google-oauth-${firebaseUid}`,
+            profile,
+          });
+        }
+        return studentId;
+      }
+    }
+
     const session = this.sessions.get(token);
     if (!session) return undefined;
     if (session.expiresAt <= Date.now()) {
@@ -195,7 +221,7 @@ export class InMemoryRepository implements Repository {
   }
 
   listItems(studentId: string, filter = "all"): StudyItem[] {
-    const items = [...(this.items.get(studentId)?.values() ?? [])];
+    const items = [...(this.items.get(studentId)?.values() ?? [])].reverse();
     return copy(filter === "favorites" ? items.filter((item) => item.isFavorite)
       : filter === "all" ? items : items.filter((item) => item.type === filter));
   }

@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/api/items"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "title": "Postman Test Note",
+      "type": "note",
+      "date": "2026-10-11",
+      "content": {
+        "summary": "Testing via Postman API suite",
+        "notes": "All endpoints functional"
+      },
+      "tags": ["test", "api"]
+    }
+order: 11000

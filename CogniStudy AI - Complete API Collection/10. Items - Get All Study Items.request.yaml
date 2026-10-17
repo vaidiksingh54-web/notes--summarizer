@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/items?type=all"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+queryParams:
+  type: all
+order: 10000

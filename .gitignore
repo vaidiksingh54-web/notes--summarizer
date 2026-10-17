@@ -7,6 +7,8 @@ coverage/
 .env
 .env.*
 !.env.example
+unset.env
+*.env
 *.db
 *.sqlite3
 backend/study_app.db

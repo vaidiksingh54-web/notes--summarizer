@@ -9,9 +9,9 @@
   <meta property="og:description" content="Next-gen AI learning platform to turn lengthy notes into clear summaries, interactive flashcards, and self-testing quizzes.">
   <meta property="og:type" content="website">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
   <div class="ambient-glow-top-right"></div>
@@ -495,7 +495,10 @@
           demoEmpty.style.display = "none";
           demoResult.style.display = "block";
           demoBody.innerHTML = `
-            <h4 style="color: #38bdf8; font-weight: 700; margin-bottom: 8px;">Key Takeaways:</h4>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <h4 style="color: #38bdf8; font-weight: 700; margin:0;">Key Takeaways:</h4>
+              <span class="badge badge-cyan" style="font-size:0.7rem; padding:2px 8px;">Sample Preview</span>
+            </div>
             <ul style="padding-left: 20px; margin-bottom: 12px;">
               <li><strong>Energy Conversion:</strong> Photons are converted into ATP and NADPH in the thylakoids.</li>
               <li><strong>Photolysis:</strong> Water molecules are cleaved into H+ and oxygen gas (O2).</li>
@@ -504,6 +507,9 @@
             <div style="background: rgba(99, 102, 241, 0.1); border-left: 3px solid #6366f1; padding: 10px; border-radius: 6px; font-size: 0.85rem;">
               💡 <strong>Exam Formula:</strong> 6 CO2 + 6 H2O + Light → C6H12O6 + 6 O2.
             </div>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-faint);">
+              Ready to summarize your own material? <a href="notes.html" style="color: var(--accent-cyan); text-decoration: underline; font-weight:600;">Launch Full AI Summarizer ↗</a>
+            </p>
           `;
           demoGenBtn.disabled = false;
           demoGenBtn.innerHTML = `Generate AI Summary ✦`;

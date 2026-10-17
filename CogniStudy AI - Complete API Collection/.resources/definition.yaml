@@ -1,0 +1,5 @@
+$kind: collection
+description: API collection to test all backend routes including Auth, AI Study Tools, Study Items CRUD, and Student Profile.
+variables:
+  baseUrl: http://localhost:3000
+  token: ""

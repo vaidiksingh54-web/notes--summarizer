@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/mindmap/generate"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "topic": "Machine Learning Fundamentals",
+      "depth": 3,
+      "text": "Supervised, unsupervised, and reinforcement learning. Gradient descent, loss functions, neural networks."
+    }
+order: 7000

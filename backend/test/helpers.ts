@@ -49,8 +49,14 @@ export function createTestAi(): StudyAi {
   };
 }
 
-export async function startTestServer(ai?: StudyAi): Promise<{ baseUrl: string; close: () => Promise<void> }> {
-  const server: Server = createServer(createApp({ ai: ai ?? createTestAi() }));
+import { InMemoryRepository } from "../src/repository/databaseRepository.js";
+import type { Repository } from "../src/repository/repository.js";
+
+export async function startTestServer(ai?: StudyAi, repository?: Repository): Promise<{ baseUrl: string; close: () => Promise<void> }> {
+  const server: Server = createServer(createApp({
+    ai: ai ?? createTestAi(),
+    repository: repository ?? new InMemoryRepository(),
+  }));
   await new Promise<void>((resolve, reject) => {
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);

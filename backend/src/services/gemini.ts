@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { ApiError, type ChatRequest, type FlashcardRequest, type MindMapNode, type MindMapRequest, type QuizQuestion, type QuizRequest, type StudyAi } from "../types.js";
+import { ApiError, type ChatRequest, type FlashcardRequest, type MindMapNode, type MindMapRequest, type QuizQuestion, type QuizRequest, type StudyAi, type SummaryOptions } from "../types.js";
 import { parseGeneratedCards, parseGeneratedMindMap, parseGeneratedQuiz } from "../validation.js";
 
 type GeminiClient = Pick<GoogleGenAI, "models">;
@@ -44,10 +44,10 @@ export class GeminiStudyAi implements StudyAi {
     return key;
   }
 
-  private async generateText(prompt: string): Promise<string> {
+  private async generateText(prompt: string, responseMimeType?: string): Promise<string> {
     const key = this.requireKey();
     const client = this.createClient(key);
-    const candidateModels = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
+    const candidateModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"];
     let lastError: unknown;
 
     for (const model of candidateModels) {
@@ -55,6 +55,7 @@ export class GeminiStudyAi implements StudyAi {
         const response = await client.models.generateContent({
           model,
           contents: prompt,
+          ...(responseMimeType ? { config: { responseMimeType } } : {}),
         });
         const text = response.text?.trim();
         if (text) {
@@ -71,10 +72,40 @@ export class GeminiStudyAi implements StudyAi {
     throw new ApiError(502, "GEMINI_PROVIDER_ERROR", "The AI provider failed. Please try again later.");
   }
 
-  async summarize(text: string): Promise<string> {
-    return this.generateText(
-      `Create a concise, accurate study summary with key concepts, definitions, and high-yield revision points. Return plain text only.\n\n${text}`,
-    );
+  async summarize(text: string, options?: SummaryOptions): Promise<string> {
+    const lengthDirective =
+      options?.length === "short"
+        ? "Length: Ultra-concise study summary focusing strictly on core definitions and bottom-line takeaways."
+        : options?.length === "comprehensive"
+        ? "Length: In-depth comprehensive academic study guide exploring deep mechanisms, contextual nuance, and thorough explanations."
+        : "Length: Balanced standard study summary covering key concepts, definitions, and main takeaways.";
+
+    const styleDirective =
+      options?.style === "bulleted"
+        ? "Format: Structured high-yield bullet points with bold highlights for key terms and concepts."
+        : options?.style === "cheatsheet"
+        ? "Format: Rapid-recall exam cheatsheet with concise formulas, memory cues, and core definitions."
+        : "Format: Detailed sections with clear headings, conceptual explanations, and revision takeaways.";
+
+    const difficultyDirective =
+      options?.difficulty === "beginner"
+        ? "Audience: Introductory learner level using clear analogies and intuitive, accessible explanations."
+        : options?.difficulty === "advanced"
+        ? "Audience: Advanced undergraduate or research examination level using precise academic terminology."
+        : "Audience: College undergraduate study level.";
+
+    const prompt = `You are CogniStudy AI Tutor, an expert academic study assistant.
+Create an accurate, structured study summary of the following notes.
+${lengthDirective}
+${styleDirective}
+${difficultyDirective}
+
+Return clean, readable text with markdown formatting (headings, bullet points, bold highlights) for optimal study clarity.
+
+[SOURCE STUDY MATERIAL]:
+${text}`;
+
+    return this.generateText(prompt);
   }
 
   async generateFlashcards(request: FlashcardRequest): Promise<Array<{ question: string; answer: string }>> {
@@ -85,6 +116,7 @@ export class GeminiStudyAi implements StudyAi {
       `Create exactly ${request.count} ${request.difficulty} study flashcards about "${request.topic}". ${source}
 Return JSON only in this shape: {"cards":[{"question":"...","answer":"..."}]}
 Do not wrap the JSON in markdown code blocks.`,
+      "application/json",
     );
     const payload = parseModelJson(text);
     const cards = payload && typeof payload === "object" && "cards" in payload
@@ -126,6 +158,7 @@ CogniStudy AI Tutor:`;
 Each question must have exactly 4 choices in "options", "correct" index (0, 1, 2, or 3), and an "explanation".
 Return JSON only in this shape: {"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"..."}]}
 Do not wrap the JSON in markdown code blocks.`,
+      "application/json",
     );
     const payload = parseModelJson(text);
     const questions = payload && typeof payload === "object" && "questions" in payload
@@ -187,6 +220,7 @@ Requirements:
   ]
 }
 Do not wrap in markdown backticks or explanations. Return JSON only.`,
+      "application/json",
     );
     const payload = parseModelJson(text);
     return parseGeneratedMindMap(payload);
