@@ -35,6 +35,12 @@ function currentPage() {
 }
 
 function getApiBaseUrl() {
+  if (typeof window !== "undefined" && window.COGNISTUDY_API_URL) {
+    return window.COGNISTUDY_API_URL.replace(/\/$/, "");
+  }
+  if (typeof localStorage !== "undefined" && localStorage.getItem("cogni_api_url")) {
+    return localStorage.getItem("cogni_api_url").replace(/\/$/, "");
+  }
   if (typeof window !== "undefined" && window.location && window.location.port && window.location.port !== "3000" && window.location.port !== "5000" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
     return "http://localhost:3000";
   }
@@ -216,8 +222,13 @@ class StudyStore {
         }
       });
     } catch (networkErr) {
-      if (getApiBaseUrl()) {
-        throw new Error("Cannot connect to CogniStudy backend at http://localhost:3000. Start the server with `npm run dev`.");
+      const base = getApiBaseUrl();
+      if (base) {
+        if (base.includes("localhost")) {
+          throw new Error("Cannot connect to CogniStudy backend at http://localhost:3000. Start the server with `npm run dev`.");
+        } else {
+          throw new Error(`Cannot connect to CogniStudy backend at ${base}. If using Render free tier, the server may take up to 45 seconds to wake up from idle. Please wait a moment and try again.`);
+        }
       }
       throw networkErr;
     }
@@ -227,6 +238,9 @@ class StudyStore {
     if (response.status === 401 && !PUBLIC_PAGES.has(currentPage())) {
       localStorage.removeItem(TOKEN_KEY);
       window.location.replace("login.html");
+    }
+    if (response.status === 404 && !getApiBaseUrl() && (window.location.hostname.endsWith(".vercel.app") || window.location.hostname.includes("vercel"))) {
+      throw new Error("Backend API not connected to Vercel. In frontend/js/config.js, set window.COGNISTUDY_API_URL to your Render backend URL (e.g. https://your-backend.onrender.com).");
     }
     if (response.status === 405) {
       throw new Error("The API is not available on this web server. Start the app with `npm run dev` and open http://localhost:3000.");

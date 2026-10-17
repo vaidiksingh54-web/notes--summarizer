@@ -71,11 +71,4 @@ CREATE POLICY "Service Role Access Study Items" ON public.study_items FOR ALL TO
 CREATE POLICY "Service Role Access Activities" ON public.activities FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY "Service Role Access Notifications" ON public.notifications FOR ALL TO service_role USING (true) WITH CHECK (true);
 
--- Seed Initial Demo Student (Alex Chen)
-INSERT INTO public.students (id, email, password_hash, profile)
-VALUES (
-    'student-demo-001',
-    'demo@cognistudy.ai',
-    '0123456789abcdef0123456789abcdef:3fa6557216112ba000b4c441cc1777857516d2d8f2e20f965a56181d1adf8295d1885848490f6ed1c2cb1b9457424374b7a236dfb92ed69c293f7ed002172661',
-    '{"name": "Alex Chen", "email": "demo@cognistudy.ai", "phone": "+1 555-0199", "college": "Stanford University", "course": "Computer Science", "age": 21, "bio": "Undergraduate researcher focused on educational AI.", "avatar": "AC"}'::jsonb
-) ON CONFLICT (id) DO NOTHING;
+-- Schema creation complete. Tables start clean with zero demo content.

@@ -59,10 +59,10 @@ function initGoogleAuth() {
         console.error("Google sign-in error:", error);
         const msg = error?.message || String(error);
         if (msg.includes("unauthorized-domain") || error?.code === "auth/unauthorized-domain") {
-          const isIp = window.location.hostname === "127.0.0.1";
-          const advice = isIp
+          const host = window.location.hostname;
+          const advice = host === "127.0.0.1"
             ? "Google Sign-In requires 'localhost'. Please open http://localhost:3000 in your browser, or add '127.0.0.1' under Firebase Console > Authentication > Settings > Authorized Domains."
-            : "This domain is not authorized in Firebase Auth. Add this domain under Firebase Console > Authentication > Settings > Authorized Domains, or sign in with your student email and password.";
+            : `Domain '${host}' is not authorized in Firebase Auth. In Firebase Console > Authentication > Settings > Authorized Domains, add '${host}'.`;
           if (typeof window.showToast === "function") {
             window.showToast(advice, "error");
           }
@@ -115,7 +115,11 @@ function initLoginForm() {
       window.showToast("Enter your student email and password.", "error");
       return;
     }
-    if (submit) submit.disabled = true;
+    const origHtml = submit ? submit.innerHTML : "";
+    if (submit) {
+      submit.disabled = true;
+      submit.innerHTML = `<span>Signing in...</span>`;
+    }
     try {
       await window.store.login(email, password);
       window.showToast("Signed in.", "success");
@@ -125,11 +129,13 @@ function initLoginForm() {
     } catch (error) {
       window.showToast(error.message || "Unable to sign in.", "error");
     } finally {
-      if (submit) submit.disabled = false;
+      if (submit) {
+        submit.disabled = false;
+        submit.innerHTML = origHtml;
+      }
     }
   });
 }
-
 
 function initSignupForm() {
   const signupForm = document.getElementById("form-signup");
@@ -150,7 +156,11 @@ function initSignupForm() {
       window.showToast("Fill name, email, password, college, and course.", "error");
       return;
     }
-    if (submit) submit.disabled = true;
+    const origHtml = submit ? submit.innerHTML : "";
+    if (submit) {
+      submit.disabled = true;
+      submit.innerHTML = `<span>Creating account...</span>`;
+    }
     try {
       await window.store.signup(fields);
       window.showToast("Student account created.", "success");
@@ -160,7 +170,10 @@ function initSignupForm() {
     } catch (error) {
       window.showToast(error.message || "Unable to create account.", "error");
     } finally {
-      if (submit) submit.disabled = false;
+      if (submit) {
+        submit.disabled = false;
+        submit.innerHTML = origHtml;
+      }
     }
   });
 }
