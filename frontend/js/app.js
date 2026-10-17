@@ -288,7 +288,7 @@ function initAiAssistantWidget() {
             <div style="font-weight: 700; color: #fff; font-size: 0.95rem;" id="ai-panel-title">CogniStudy AI Tutor</div>
             <div style="font-size: 0.72rem; color: #34d399; display: flex; align-items: center; gap: 4px;">
               <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#34d399;"></span>
-              Powered by Gemini 2.5
+              Powered by Gemini 3.8 Flash
             </div>
           </div>
         </div>
@@ -455,7 +455,7 @@ function initAiAssistantWidget() {
 
     try {
       if (!window.store.getToken()) {
-        throw new Error("Please sign in or register to use the server-side AI study assistant.");
+        throw new Error("Please sign in or create an account to use the AI Study Assistant. All study tools are connected to your personal student account.");
       }
 
       const reply = await window.store.askAssistant(text, context, conversationHistory);

@@ -59,8 +59,12 @@ function initGoogleAuth() {
         console.error("Google sign-in error:", error);
         const msg = error?.message || String(error);
         if (msg.includes("unauthorized-domain") || error?.code === "auth/unauthorized-domain") {
+          const isIp = window.location.hostname === "127.0.0.1";
+          const advice = isIp
+            ? "Google Sign-In requires 'localhost'. Please open http://localhost:3000 in your browser, or add '127.0.0.1' under Firebase Console > Authentication > Settings > Authorized Domains."
+            : "This domain is not authorized in Firebase Auth. Add this domain under Firebase Console > Authentication > Settings > Authorized Domains, or sign in with your student email and password.";
           if (typeof window.showToast === "function") {
-            window.showToast("This domain is not authorized in Firebase Auth. Add this domain under Firebase Console > Authentication > Settings > Authorized Domains, or sign in with your student email and password.", "error");
+            window.showToast(advice, "error");
           }
           document.getElementById("login-email")?.focus();
         } else if (msg.includes("popup-blocked") || error?.code === "auth/popup-blocked") {

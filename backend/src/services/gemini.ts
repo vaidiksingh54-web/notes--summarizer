@@ -49,9 +49,9 @@ export class GeminiStudyAi implements StudyAi {
     const client = this.createClient(key);
     const candidateModels = [
       process.env.GEMINI_MODEL,
+      "gemini-3.8-flash",
+      "gemini-3.5-flash-lite",
       "gemini-2.5-flash",
-      "gemini-2.5-flash-lite",
-      "gemini-1.5-flash",
       "gemini-2.0-flash",
     ].filter(Boolean) as string[];
     let lastError: unknown;
