@@ -79,3 +79,19 @@ test("google authentication creates student account and supports firebase tokens
   assert.ok(directFb.data.profile);
 });
 
+test("google authentication protects password-authenticated accounts from takeover", async () => {
+  // riya@college.edu was created with password 'student12' earlier
+  const takeoverAttempt = await json(baseUrl, "/api/auth/google", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      email: "riya@college.edu",
+      name: "Attacker Impersonator",
+      uid: "attacker-fake-uid",
+    }),
+  });
+  assert.equal(takeoverAttempt.status, 409);
+  assert.equal(takeoverAttempt.data.code, "ACCOUNT_EXISTS_PASSWORD");
+});
+
+

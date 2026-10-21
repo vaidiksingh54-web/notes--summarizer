@@ -3,7 +3,33 @@
  * Initializes global navbar, dropdowns, notifications, modal system, toasts, and mobile drawer.
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+// Global safe Assistant openers
+window.openAiAssistant = function(prefillPrompt) {
+  let panel = document.getElementById("ai-assistant-panel");
+  if (!panel) {
+    initAiAssistantWidget();
+    panel = document.getElementById("ai-assistant-panel");
+  }
+  if (panel) {
+    panel.classList.add("active");
+    const input = document.getElementById("ai-user-input");
+    if (input) {
+      if (prefillPrompt) input.value = prefillPrompt;
+      setTimeout(() => input.focus(), 60);
+    }
+  }
+};
+
+window.toggleAiAssistant = function() {
+  const panel = document.getElementById("ai-assistant-panel");
+  if (panel && panel.classList.contains("active")) {
+    panel.classList.remove("active");
+  } else {
+    window.openAiAssistant();
+  }
+};
+
+function bootApp() {
   initNavbar();
   initDropdowns();
   initModals();
@@ -11,11 +37,22 @@ document.addEventListener("DOMContentLoaded", () => {
   initOfflineState();
   syncUserProfileUI();
   initAiAssistantWidget();
-  window.store.ready.then(() => {
-    syncUserProfileUI();
-    renderNotifications();
-  });
-});
+  if (window.location.hash === "#assistant") {
+    setTimeout(() => window.openAiAssistant(), 250);
+  }
+  if (window.store && window.store.ready) {
+    window.store.ready.then(() => {
+      syncUserProfileUI();
+      renderNotifications();
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootApp);
+} else {
+  bootApp();
+}
 
 // Safe Link Opener without window.open
 window.openSafeExternalLink = function(url) {
@@ -392,6 +429,15 @@ function initAiAssistantWidget() {
       checkContextAvailability();
       input.focus();
     }
+  });
+
+  document.querySelectorAll(".nav-link-assistant, .sidebar-item-assistant, [data-open-assistant]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      panel.classList.add("active");
+      checkContextAvailability();
+      input?.focus();
+    });
   });
 
   closeBtn.addEventListener("click", () => {

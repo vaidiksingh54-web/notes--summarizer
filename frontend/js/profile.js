@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await window.store.ready;
   renderProfileDetails();
   initEditProfileModal();
+  initBackendConnectionCard();
 });
 
 function renderProfileDetails() {
@@ -98,4 +99,119 @@ function initEditProfileModal() {
       }
     });
   }
+}
+
+
+function initBackendConnectionCard() {
+  const input = document.getElementById("input-backend-url");
+  const badge = document.getElementById("backend-status-badge");
+  const saveBtn = document.getElementById("btn-save-backend-url");
+  const testBtn = document.getElementById("btn-test-backend-url");
+  const resetBtn = document.getElementById("btn-reset-backend-url");
+  const resultDiv = document.getElementById("backend-test-result");
+
+  if (!input) return;
+
+  const savedUrl = localStorage.getItem("cogni_api_url") || window.COGNISTUDY_API_URL || "";
+  input.value = savedUrl;
+
+  async function checkHealth(url) {
+    if (!url) {
+      if (badge) {
+        badge.className = "badge badge-gray";
+        badge.textContent = "Not Configured";
+      }
+      return null;
+    }
+    if (badge) {
+      badge.className = "badge badge-cyan";
+      badge.textContent = "Checking...";
+    }
+    try {
+      const cleanUrl = url.replace(/\/+$/, "");
+      const res = await fetch(`${cleanUrl}/api/health`, { method: "GET", signal: AbortSignal.timeout(8000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (badge) {
+        badge.className = "badge badge-green";
+        badge.style.background = "rgba(34, 197, 94, 0.2)";
+        badge.style.color = "#22c55e";
+        badge.textContent = "Online & Connected";
+      }
+      return data;
+    } catch (_err) {
+      if (badge) {
+        badge.className = "badge badge-red";
+        badge.style.background = "rgba(239, 68, 68, 0.2)";
+        badge.style.color = "#ef4444";
+        badge.textContent = "Offline / Unreachable";
+      }
+      return null;
+    }
+  }
+
+  if (savedUrl) {
+    checkHealth(savedUrl);
+  } else if (badge) {
+    badge.className = "badge badge-gray";
+    badge.textContent = "Not Configured";
+  }
+
+  testBtn?.addEventListener("click", async () => {
+    const url = input.value.trim();
+    if (!url) {
+      window.showToast("Enter your Render backend URL first.", "error");
+      return;
+    }
+    testBtn.disabled = true;
+    testBtn.textContent = "Pinging...";
+    if (resultDiv) {
+      resultDiv.style.display = "block";
+      resultDiv.style.color = "var(--text-muted)";
+      resultDiv.innerHTML = "Connecting to backend... If Render was asleep, this may take up to 45s.";
+    }
+    const health = await checkHealth(url);
+    testBtn.disabled = false;
+    testBtn.textContent = "Test Live API";
+    if (health) {
+      if (resultDiv) {
+        resultDiv.style.color = "#22c55e";
+        resultDiv.innerHTML = `✓ Backend online! Storage: <strong>${health.storage}</strong> • Gemini AI: <strong>${health.geminiConfigured ? "Configured" : "Not Set"}</strong>`;
+      }
+      window.showToast("Backend connection verified!", "success");
+    } else {
+      if (resultDiv) {
+        resultDiv.style.color = "#ef4444";
+        resultDiv.innerHTML = `✕ Could not reach ${url}. Ensure the Render service is deployed and active.`;
+      }
+      window.showToast("Failed to reach backend.", "error");
+    }
+  });
+
+  saveBtn?.addEventListener("click", async () => {
+    const url = input.value.trim().replace(/\/+$/, "");
+    if (!url) {
+      window.showToast("Please enter a valid URL.", "error");
+      return;
+    }
+    localStorage.setItem("cogni_api_url", url);
+    window.COGNISTUDY_API_URL = url;
+    window.showToast("Backend URL saved! Reloading data...", "success");
+    await checkHealth(url);
+    if (window.store) {
+      await window.store.loadFromApi();
+      renderProfileDetails();
+    }
+  });
+
+  resetBtn?.addEventListener("click", () => {
+    localStorage.removeItem("cogni_api_url");
+    input.value = "";
+    if (badge) {
+      badge.className = "badge badge-gray";
+      badge.textContent = "Not Configured";
+    }
+    if (resultDiv) resultDiv.style.display = "none";
+    window.showToast("Backend URL reset.", "info");
+  });
 }

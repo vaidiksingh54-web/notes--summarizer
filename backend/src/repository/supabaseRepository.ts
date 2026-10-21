@@ -17,7 +17,7 @@ export class SupabaseRepository implements Repository {
 
   constructor(
     supabaseUrl = process.env.SUPABASE_URL,
-    supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY
+    supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY
   ) {
     if (!supabaseUrl || !supabaseKey) {
       throw new Error(

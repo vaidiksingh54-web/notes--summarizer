@@ -4,6 +4,7 @@ import { ApiError, type StudyAi } from "./types.js";
 import { GeminiStudyAi } from "./services/gemini.js";
 import { InMemoryRepository } from "./repository/databaseRepository.js";
 import { SqliteRepository } from "./repository/sqliteRepository.js";
+import { SupabaseRepository } from "./repository/supabaseRepository.js";
 import type { Repository } from "./repository/repository.js";
 import { createRequireAuth, studentIdOf } from "./services/auth.js";
 import { registerAiRoutes } from "./routes/ai.js";
@@ -14,11 +15,21 @@ import { registerProfileRoutes } from "./routes/profile.js";
 import { securityHeaders, createRateLimiter } from "./middleware/security.js";
 
 export function createApp(options: { repository?: Repository; ai?: StudyAi } = {}) {
-  const repository = options.repository ?? (
-    process.env.STORAGE_TYPE === "in-memory"
-      ? new InMemoryRepository()
-      : new SqliteRepository()
-  );
+  let repository: Repository;
+  if (options.repository) {
+    repository = options.repository;
+  } else if (process.env.STORAGE_TYPE === "in-memory") {
+    repository = new InMemoryRepository();
+  } else if (process.env.STORAGE_TYPE === "supabase") {
+    repository = new SupabaseRepository();
+  } else {
+    repository = new SqliteRepository();
+  }
+
+
+
+
+
   const ai = options.ai ?? new GeminiStudyAi();
   const requireAuth = createRequireAuth(repository);
   const app = express();
@@ -61,12 +72,15 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
     aiLimiter,
   );
 
+
   app.get("/api/health", (_request, response) => {
     const key = process.env.GEMINI_API_KEY?.trim();
-    const isInMemory = repository instanceof InMemoryRepository;
+    let storageType = "sqlite-persistent";
+    if (repository instanceof InMemoryRepository) storageType = "in-memory-per-student";
+    else if (repository instanceof SupabaseRepository) storageType = "supabase-persistent";
     response.json({
       status: "ok",
-      storage: isInMemory ? "in-memory-per-student" : "sqlite-persistent",
+      storage: storageType,
       auth: "student-accounts",
       geminiConfigured: Boolean(key && key !== "YOUR_GEMINI_API_KEY" && key !== "MY_GEMINI_API_KEY"),
     });

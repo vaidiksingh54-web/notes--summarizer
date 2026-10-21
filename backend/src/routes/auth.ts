@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { ApiError } from "../types.js";
+import { ApiError, type Profile } from "../types.js";
 import type { Repository } from "../repository/repository.js";
 import { authPayload, bearerToken, hashPassword, verifyPassword } from "../services/auth.js";
 import { parseLogin, parseSignup, studentAvatar } from "../validation.js";
@@ -53,16 +53,28 @@ export function registerAuthRoutes(app: Express, repository: Repository): void {
         throw new ApiError(400, "INVALID_FIELDS", "email and uid are required for Google authentication.");
       }
       const existing = await repository.findStudentByEmail(email);
-      const student = existing ?? await repository.createStudent(email, `google-oauth-${uid}`, {
-        name,
-        email,
-        phone: "",
-        college: "Google Verified",
-        course: "General Studies",
-        age: 20,
-        bio: "Student verified via Google OAuth.",
-        avatar: studentAvatar(name),
-      });
+      let student: { id: string; profile: Profile };
+      if (existing) {
+        if (!existing.passwordHash.startsWith("google-oauth-")) {
+          throw new ApiError(
+            409,
+            "ACCOUNT_EXISTS_PASSWORD",
+            "An account with this email was registered using password authentication. Please sign in with your email and password."
+          );
+        }
+        student = existing;
+      } else {
+        student = await repository.createStudent(email, `google-oauth-${uid}`, {
+          name,
+          email,
+          phone: "",
+          college: "Google Verified",
+          course: "General Studies",
+          age: 20,
+          bio: "Student verified via Google OAuth.",
+          avatar: studentAvatar(name),
+        });
+      }
       const token = await repository.createSession(student.id);
       response.json(authPayload(token, student.profile));
     } catch (error) {

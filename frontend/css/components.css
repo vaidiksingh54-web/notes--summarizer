@@ -766,21 +766,49 @@
    Embedded AI Study Assistant Widget
    ========================================================================== */
 
+.nav-link.nav-link-assistant {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(168, 85, 247, 0.28));
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+  transition: all var(--transition-fast);
+}
+
+.nav-link.nav-link-assistant:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.5));
+  border-color: rgba(236, 72, 153, 0.6);
+  transform: translateY(-1px);
+}
+
+.sidebar-item.sidebar-item-assistant {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.16));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.sidebar-item.sidebar-item-assistant:hover {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.35));
+  border-color: rgba(168, 85, 247, 0.55);
+  color: #ffffff;
+}
+
 .ai-assistant-trigger {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 250;
-  display: flex;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 99999 !important;
+  display: flex !important;
   align-items: center;
   gap: 10px;
   padding: 12px 20px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%) !important;
+  color: #ffffff !important;
   font-weight: 700;
   font-size: 0.92rem;
-  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.25) !important;
   border: none;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -788,7 +816,7 @@
 
 .ai-assistant-trigger:hover {
   transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 14px 32px rgba(168, 85, 247, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.35);
+  box-shadow: 0 14px 32px rgba(168, 85, 247, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.4) !important;
 }
 
 .ai-assistant-trigger .sparkle-icon {
