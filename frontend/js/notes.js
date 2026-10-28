@@ -157,15 +157,39 @@ async function extractTextFromPdf(file) {
       e.stopPropagation();
       filePreview.style.display = "none";
       if (fileInput) fileInput.value = "";
+      if (notesTextarea && notesTextarea.value) {
+        notesTextarea.value = "";
+        notesTextarea.dispatchEvent(new Event("input"));
+      }
+      window.showToast("Uploaded file and extracted content removed.", "info");
     });
   }
 
+  const charRow = document.getElementById("char-count")?.parentElement;
+  
+  function setInputTab(mode) {
+    document.querySelectorAll("[data-input-tab]").forEach(t => {
+      t.classList.toggle("active", t.getAttribute("data-input-tab") === mode);
+    });
+    if (mode === "doc") {
+      if (notesTextarea) notesTextarea.style.display = "none";
+      if (charRow) charRow.style.display = "none";
+      if (dropzone) dropzone.style.display = "block";
+    } else {
+      if (notesTextarea) notesTextarea.style.display = "block";
+      if (charRow) charRow.style.display = "flex";
+      if (dropzone) dropzone.style.display = "none";
+    }
+  }
+
+  // Initialize tabs (default to text, or doc if URL param ?mode=doc)
+  const initialMode = new URLSearchParams(window.location.search).get("mode") === "doc" ? "doc" : "text";
+  setInputTab(initialMode);
+
   document.querySelectorAll("[data-input-tab]").forEach(tab => {
     tab.addEventListener("click", () => {
-      document.querySelectorAll("[data-input-tab]").forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
       const mode = tab.getAttribute("data-input-tab");
-      window.showToast(`Switched input mode to ${mode.toUpperCase()}`, "info");
+      setInputTab(mode);
     });
   });
 

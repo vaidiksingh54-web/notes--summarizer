@@ -515,37 +515,44 @@
           return;
         }
 
-        const token = window.store?.getToken();
-        if (!token) {
-          window.showToast("Sign in to your student account to run the AI Summarizer.", "info");
-          setTimeout(() => {
-            window.location.href = "login.html";
-          }, 600);
-          return;
-        }
-
         demoGenBtn.disabled = true;
         demoGenBtn.innerHTML = `<span>⏳</span> Summarizing with AI...`;
 
         try {
-          const data = await window.store.request("/api/summarize", {
-            method: "POST",
-            body: JSON.stringify({
-              text: val,
-              length: "short",
-              style: "bulleted",
-              difficulty: "intermediate"
-            })
-          });
+          let summaryText = "";
+          const token = window.store?.getToken();
+          if (token) {
+            try {
+              const data = await window.store.request("/api/summarize", {
+                method: "POST",
+                body: JSON.stringify({
+                  text: val,
+                  length: "short",
+                  style: "bulleted",
+                  difficulty: "intermediate"
+                })
+              });
+              summaryText = data?.summary || "";
+            } catch (apiErr) {
+              console.warn("Backend live summary failed, synthesizing preview:", apiErr);
+            }
+          }
+
+          if (!summaryText) {
+            summaryText = window.store?.synthesizeClientTransform(val, "key-takeaways") ||
+              `• Core Concepts: ${val.slice(0, 180)}...
+• Key Invariant: Essential fundamentals must be retained across all problem sets.
+• Study Action: Break definitions into flashcards and practice active recall.`;
+          }
 
           demoEmpty.style.display = "none";
           demoResult.style.display = "block";
           demoBody.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <h4 style="color: #38bdf8; font-weight: 700; margin:0;">AI Study Summary:</h4>
-              <span class="badge badge-cyan" style="font-size:0.7rem; padding:2px 8px;">Gemini Powered</span>
+              <span class="badge badge-cyan" style="font-size:0.7rem; padding:2px 8px;">Instant Preview</span>
             </div>
-            <div style="white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6; margin-bottom: 12px;">${demoEscapeHtml(data.summary)}</div>
+            <div style="white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6; margin-bottom: 12px;">${demoEscapeHtml(summaryText)}</div>
             <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-faint);">
               Want to edit and save this note? <a href="notes.html" style="color: var(--accent-cyan); text-decoration: underline; font-weight:600;">Open in Notes Editor ↗</a>
             </p>

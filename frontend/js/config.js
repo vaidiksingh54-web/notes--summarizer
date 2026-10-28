@@ -1,11 +1,9 @@
 /**
- * CogniStudy AI - Production API Configuration
- * 
- * If your backend is deployed on Render (e.g. https://cognistudy-backend.onrender.com),
- * paste your Render backend URL below so your Vercel frontend connects to it.
- * 
- * Example:
- * window.COGNISTUDY_API_URL = "https://cognistudy-backend.onrender.com";
+ * CogniStudy AI - Production Configuration
  */
-window.COGNISTUDY_API_URL = window.COGNISTUDY_API_URL || "";
 
+// Active Render backend URL for API requests and database synchronization
+window.COGNISTUDY_API_URL = window.COGNISTUDY_API_URL || "https://notes-summarizer-tpa1.onrender.com";
+
+// Google Sign-In OAuth Client ID (from Google Cloud Console -> APIs & Credentials)
+window.GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || "";

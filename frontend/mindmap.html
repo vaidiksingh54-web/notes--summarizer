@@ -298,7 +298,7 @@
             Explore details, formulas, and connections for this branch.
           </p>
           <div style="display: flex; gap: 8px;">
-            <button class="btn btn-ghost btn-sm" style="color: var(--accent-cyan); font-size: 0.78rem;" onclick="navigator.clipboard?.writeText(document.getElementById('mm-inspect-title').textContent); showToast('Concept copied!', 'success');">
+            <button class="btn btn-ghost btn-sm" style="color: var(--accent-cyan); font-size: 0.78rem;" onclick="window.copyToClipboard(document.getElementById('mm-inspect-title').textContent, 'Concept copied!');">
               📋 Copy Concept
             </button>
           </div>

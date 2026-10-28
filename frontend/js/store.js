@@ -35,11 +35,11 @@ function currentPage() {
 }
 
 function getApiBaseUrl() {
-  if (typeof window !== "undefined" && window.COGNISTUDY_API_URL) {
-    return window.COGNISTUDY_API_URL.replace(/\/$/, "");
-  }
   if (typeof localStorage !== "undefined" && localStorage.getItem("cogni_api_url")) {
     return localStorage.getItem("cogni_api_url").replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined" && window.COGNISTUDY_API_URL) {
+    return window.COGNISTUDY_API_URL.replace(/\/$/, "");
   }
   if (typeof window !== "undefined" && window.location && window.location.port && window.location.port !== "3000" && window.location.port !== "5000" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
     return "http://localhost:3000";

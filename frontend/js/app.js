@@ -55,6 +55,39 @@ if (document.readyState === "loading") {
 }
 
 // Safe Link Opener without window.open
+// Universal Clipboard Copy with Fallback
+window.copyToClipboard = function(text, successMsg = "Copied to clipboard!") {
+  if (!text) return;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(() => window.showToast(successMsg, "success"))
+      .catch(() => fallbackCopy(text, successMsg));
+  } else {
+    fallbackCopy(text, successMsg);
+  }
+
+  function fallbackCopy(str, msg) {
+    try {
+      const el = document.createElement("textarea");
+      el.value = str;
+      el.style.position = "fixed";
+      el.style.left = "-9999px";
+      el.style.top = "0";
+      document.body.appendChild(el);
+      el.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(el);
+      if (ok) {
+        window.showToast(msg, "success");
+      } else {
+        window.showToast("Could not copy text automatically. Please select and copy.", "error");
+      }
+    } catch (_e) {
+      window.showToast("Clipboard copy failed.", "error");
+    }
+  }
+};
+
 window.openSafeExternalLink = function(url) {
   const link = document.createElement("a");
   link.href = url;

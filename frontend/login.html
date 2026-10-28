@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/auth.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="auth-page">
   <div class="ambient-glow-top-right"></div>
@@ -62,7 +63,10 @@
           <input id="login-email" name="email" type="email" autocomplete="username" placeholder="you@example.com" required>
         </div>
         <div class="auth-field">
-          <label for="login-password">Password</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="login-password" style="margin: 0;">Password</label>
+            <a href="javascript:void(0)" id="link-forgot-password" style="font-size: 0.8rem; color: var(--accent-cyan); text-decoration: none;">Forgot password?</a>
+          </div>
           <div class="auth-password-input">
             <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required minlength="8">
             <button class="auth-password-toggle" type="button" data-password-toggle="login-password" aria-label="Show password" aria-pressed="false">Show</button>

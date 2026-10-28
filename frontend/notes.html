@@ -323,7 +323,7 @@
         </p>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="share-link-input" class="glass-input" readonly value="">
-          <button class="btn btn-primary btn-sm" onclick="navigator.clipboard?.writeText(document.getElementById('share-link-input').value); showToast('Share link copied to clipboard!', 'success'); closeModal('modal-share');">Copy</button>
+          <button class="btn btn-primary btn-sm" onclick="window.copyToClipboard(document.getElementById('share-link-input').value, 'Share link copied to clipboard!'); closeModal('modal-share');">Copy</button>
         </div>
       </div>
     </div>

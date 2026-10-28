@@ -3,10 +3,10 @@
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
+  initBackendConnectionCard();
+  initEditProfileModal();
   await window.store.ready;
   renderProfileDetails();
-  initEditProfileModal();
-  initBackendConnectionCard();
 });
 
 function renderProfileDetails() {
@@ -129,7 +129,7 @@ function initBackendConnectionCard() {
     }
     try {
       const cleanUrl = url.replace(/\/+$/, "");
-      const res = await fetch(`${cleanUrl}/api/health`, { method: "GET", signal: AbortSignal.timeout(8000) });
+      const res = await fetch(`${cleanUrl}/api/health`, { method: "GET", signal: AbortSignal.timeout(35000) });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (badge) {
@@ -144,7 +144,7 @@ function initBackendConnectionCard() {
         badge.className = "badge badge-red";
         badge.style.background = "rgba(239, 68, 68, 0.2)";
         badge.style.color = "#ef4444";
-        badge.textContent = "Offline / Unreachable";
+        badge.textContent = "Offline / Sleeping";
       }
       return null;
     }
@@ -206,7 +206,8 @@ function initBackendConnectionCard() {
 
   resetBtn?.addEventListener("click", () => {
     localStorage.removeItem("cogni_api_url");
-    input.value = "";
+    input.value = window.COGNISTUDY_API_URL || "";
+    if (window.COGNISTUDY_API_URL) checkHealth(window.COGNISTUDY_API_URL);
     if (badge) {
       badge.className = "badge badge-gray";
       badge.textContent = "Not Configured";
