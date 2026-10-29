@@ -133,29 +133,6 @@ export class SqliteRepository implements Repository {
   }
 
   getStudentIdForSession(token: string): string | undefined {
-    if (token.startsWith("firebase_")) {
-      const firebaseUid = token.slice(9).trim();
-      if (firebaseUid.length > 0) {
-        const studentId = `student-fb-${firebaseUid.slice(0, 32)}`;
-        const existing = this.db.prepare("SELECT id FROM students WHERE id = ?").get(studentId);
-        if (!existing) {
-          const profile: Profile = {
-            name: "Google Student",
-            email: `student-${firebaseUid.slice(0, 8)}@google.com`,
-            phone: "",
-            college: "Google Auth",
-            course: "General Studies",
-            age: 20,
-            bio: "Google Verified Student",
-            avatar: "GS",
-          };
-          this.db.prepare(
-            "INSERT OR IGNORE INTO students (id, email, password_hash, profile) VALUES (?, ?, ?, ?)"
-          ).run(studentId, profile.email, `google-oauth-${firebaseUid}`, JSON.stringify(profile));
-        }
-        return studentId;
-      }
-    }
 
     const row = this.db.prepare(
       "SELECT student_id, expires_at FROM sessions WHERE token = ?"

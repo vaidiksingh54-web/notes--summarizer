@@ -47,44 +47,7 @@ async function triggerGoogleSignIn(btn) {
     }
   }
 
-  // 2. If Firebase Service is active and authorized domain:
-  if (window.firebaseService) {
-    const origHtml = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<span>Connecting with Google...</span>`;
-    try {
-      const { user, profile } = await window.firebaseService.signInWithGoogle();
-      let token = `firebase_${user.uid}`;
-      let userProfile = profile;
-      try {
-        const backendAuth = await window.store.request("/api/auth/google", {
-          method: "POST",
-          body: JSON.stringify({ email: user.email, name: profile.name, uid: user.uid })
-        });
-        if (backendAuth && backendAuth.token) {
-          token = backendAuth.token;
-          userProfile = backendAuth.profile;
-        }
-      } catch (_bErr) {}
-      window.store.setSession(token, userProfile);
-      window.showToast(`Welcome, ${userProfile.name}! Signed in with Google.`, "success");
-      setTimeout(() => { window.location.href = "dashboard.html"; }, 400);
-      return;
-    } catch (fbErr) {
-      console.warn("Firebase Google Sign-In:", fbErr);
-      if (fbErr?.code === "auth/unauthorized-domain") {
-        window.showToast("Domain not authorized in Firebase Console. Add this domain under Firebase > Auth > Settings > Authorized Domains.", "error");
-      } else {
-        window.showToast(fbErr.message || "Google Sign-In failed.", "error");
-      }
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = origHtml;
-    }
-    return;
-  }
-
-  // 3. Clear, honest guidance if no Client ID is configured yet
+  // 2. Clear, honest guidance if no Client ID is configured yet
   window.showToast(
     "Google Sign-In requires your Google Client ID in js/config.js. Or sign in directly with email and password below.",
     "info"

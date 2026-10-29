@@ -57,7 +57,6 @@ class StudyStore {
     this.items = [];
     this.notifications = [];
     this.activities = [];
-    this.firebaseUser = null;
     this.isOnline = navigator.onLine;
     try {
       localStorage.removeItem("cogni_local_accounts");
@@ -103,90 +102,6 @@ class StudyStore {
     this.user = { ...EMPTY_USER, ...profile, isLoggedIn: true };
   }
 
-  async onFirebaseAuthUser(user) {
-    this.firebaseUser = user;
-    let token = this.getToken();
-    let profile = null;
-
-    // Exchange with backend /api/auth/google to establish a persistent session
-    if (!token || token.startsWith("firebase_")) {
-      try {
-        const authRes = await this.request("/api/auth/google", {
-          method: "POST",
-          body: JSON.stringify({
-            email: user.email || "",
-            name: user.displayName || user.email?.split("@")[0] || "Student",
-            uid: user.uid
-          })
-        });
-        if (authRes && authRes.token) {
-          token = authRes.token;
-          profile = authRes.profile;
-        }
-      } catch (err) {
-        console.warn("Backend Google auth exchange fallback:", err);
-        token = `firebase_${user.uid}`;
-      }
-    }
-
-    if (!profile) {
-      let firestoreProfile = null;
-      if (window.firebaseService) {
-        try {
-          firestoreProfile = await window.firebaseService.getProfile();
-        } catch (err) {
-          console.warn("Could not load Firestore profile:", err);
-        }
-      }
-      profile = firestoreProfile || {
-        id: user.uid,
-        name: user.displayName || user.email?.split("@")[0] || "Student",
-        email: user.email || "",
-        phone: user.phoneNumber || "",
-        college: "",
-        course: "",
-        age: 18,
-        bio: "Google Verified Student",
-        avatar: (user.displayName || "S").slice(0, 2).toUpperCase(),
-        isLoggedIn: true
-      };
-    }
-
-    this.setSession(token, profile);
-
-    // Sync items from Firestore if available
-    if (window.firebaseService) {
-      try {
-        const firestoreItems = await window.firebaseService.listItems();
-        if (firestoreItems && firestoreItems.length > 0) {
-          const map = new Map();
-          for (const item of firestoreItems) map.set(item.id, item);
-          for (const item of this.items) {
-            if (!map.has(item.id)) map.set(item.id, item);
-          }
-          this.items = Array.from(map.values());
-        }
-      } catch (err) {
-        console.warn("Could not load Firestore items:", err);
-      }
-
-      try {
-        const firestoreActivities = await window.firebaseService.listActivities();
-        if (firestoreActivities && firestoreActivities.length > 0) {
-          this.activities = firestoreActivities;
-        }
-      } catch (err) {
-        console.warn("Could not load Firestore activities:", err);
-      }
-    }
-
-    await this.loadFromApi();
-    window.dispatchEvent(new CustomEvent("store-data-updated"));
-  }
-
-  onFirebaseAuthSignOut() {
-    this.firebaseUser = null;
-  }
 
   async loadFromApi() {
     const token = this.getToken();
@@ -284,7 +199,6 @@ class StudyStore {
       // Clear the local session even if the API is already down.
     }
     localStorage.removeItem(TOKEN_KEY);
-    this.firebaseUser = null;
     this.user = { ...EMPTY_USER };
     this.items = [];
     this.notifications = [];
@@ -324,15 +238,6 @@ class StudyStore {
       saved = { ...item, id: item.id || `item_${Date.now()}`, date: item.date || new Date().toLocaleDateString() };
     }
 
-    // Persist to Firestore if logged in with Firebase
-    if (window.firebaseService && (this.firebaseUser || window.firebaseService.getCurrentUser())) {
-      try {
-        await window.firebaseService.saveItem(saved);
-      } catch (err) {
-        console.warn("Firestore save failed, keeping local state:", err);
-      }
-    }
-
     this.items = [saved, ...this.items.filter(existing => existing.id !== saved.id)];
     return saved;
   }
@@ -344,13 +249,6 @@ class StudyStore {
         await this.request(`/api/items/${encodeURIComponent(id)}`, { method: "DELETE" });
       } catch (err) {
         console.warn("Backend delete skipped:", err);
-      }
-    }
-    if (window.firebaseService && (this.firebaseUser || window.firebaseService.getCurrentUser())) {
-      try {
-        await window.firebaseService.deleteItem(id);
-      } catch (err) {
-        console.warn("Firestore delete failed:", err);
       }
     }
     this.items = this.items.filter(item => item.id !== id);
@@ -372,13 +270,6 @@ class StudyStore {
         }
       } catch (err) {
         console.warn("Backend favorite update skipped:", err);
-      }
-    }
-    if (window.firebaseService && (this.firebaseUser || window.firebaseService.getCurrentUser())) {
-      try {
-        await window.firebaseService.toggleFavorite(id, item.isFavorite);
-      } catch (err) {
-        console.warn("Firestore toggle favorite failed:", err);
       }
     }
     this.items = this.items.map(existing => existing.id === id ? { ...existing, isFavorite: newStatus } : existing);
@@ -435,14 +326,6 @@ class StudyStore {
       saved = { ...activity, id: `act_${Date.now()}` };
     }
 
-    if (window.firebaseService && (this.firebaseUser || window.firebaseService.getCurrentUser())) {
-      try {
-        await window.firebaseService.addActivity(saved);
-      } catch (err) {
-        console.warn("Firestore activity save failed:", err);
-      }
-    }
-
     this.activities = [saved, ...this.activities].slice(0, 50);
     return saved;
   }
@@ -466,14 +349,6 @@ class StudyStore {
       }
     } else {
       this.user = { ...this.user, ...profile };
-    }
-
-    if (window.firebaseService && (this.firebaseUser || window.firebaseService.getCurrentUser())) {
-      try {
-        await window.firebaseService.saveProfile(this.user);
-      } catch (err) {
-        console.warn("Firestore profile save failed:", err);
-      }
     }
     return this.getUser();
   }

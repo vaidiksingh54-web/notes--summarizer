@@ -20,8 +20,17 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
     repository = options.repository;
   } else if (process.env.STORAGE_TYPE === "in-memory") {
     repository = new InMemoryRepository();
-  } else if (process.env.STORAGE_TYPE === "supabase") {
-    repository = new SupabaseRepository();
+  } else if (
+    (process.env.STORAGE_TYPE === "supabase" || (!process.env.STORAGE_TYPE && process.env.SUPABASE_URL)) &&
+    process.env.SUPABASE_URL &&
+    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY)
+  ) {
+    try {
+      repository = new SupabaseRepository();
+    } catch (err) {
+      console.error("Failed to initialize SupabaseRepository, falling back to SQLite:", err);
+      repository = new SqliteRepository();
+    }
   } else {
     repository = new SqliteRepository();
   }
