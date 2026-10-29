@@ -6,7 +6,7 @@ import { InMemoryRepository } from "./repository/databaseRepository.js";
 import { SqliteRepository } from "./repository/sqliteRepository.js";
 import { SupabaseRepository } from "./repository/supabaseRepository.js";
 import type { Repository } from "./repository/repository.js";
-import { createRequireAuth, studentIdOf } from "./services/auth.js";
+import { createRequireAuth, createOptionalAuth, studentIdOf } from "./services/auth.js";
 import { registerAiRoutes } from "./routes/ai.js";
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerItemRoutes } from "./routes/items.js";
@@ -41,6 +41,7 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
 
   const ai = options.ai ?? new GeminiStudyAi();
   const requireAuth = createRequireAuth(repository);
+  const optionalAuth = createOptionalAuth(repository);
   const app = express();
 
   app.disable("x-powered-by");
@@ -96,7 +97,7 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
   });
 
   registerAuthRoutes(app, repository);
-  registerAiRoutes(app, ai, requireAuth);
+  registerAiRoutes(app, ai, requireAuth, optionalAuth);
   registerItemRoutes(app, repository, requireAuth);
   registerProfileRoutes(app, repository, requireAuth);
 

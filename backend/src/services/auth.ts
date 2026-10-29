@@ -62,3 +62,17 @@ export function createRequireAuth(repository: Repository): RequestHandler {
 export function authPayload(token: string, profile: Profile) {
   return { token, profile };
 }
+
+export function createOptionalAuth(repository: Repository): RequestHandler {
+  return async (request, _response, next) => {
+    try {
+      const token = bearerToken(request);
+      if (token) {
+        request.studentId = await repository.getStudentIdForSession(token);
+      }
+      next();
+    } catch (_error) {
+      next();
+    }
+  };
+}

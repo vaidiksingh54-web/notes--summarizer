@@ -533,9 +533,6 @@ function initAiAssistantWidget() {
     sendBtn.disabled = true;
 
     try {
-      if (!window.store.getToken()) {
-        throw new Error("Please sign in or create an account to use the AI Study Assistant. All study tools are connected to your personal student account.");
-      }
 
       const reply = await window.store.askAssistant(text, context, conversationHistory);
       removeTypingIndicator(typingEl);

@@ -2,7 +2,8 @@ import type { Express, RequestHandler } from "express";
 import type { StudyAi } from "../types.js";
 import { parseChatRequest, parseFlashcardRequest, parseMindMapRequest, parseQuizRequest, parseSummaryRequest, parseTransformRequest } from "../validation.js";
 
-export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: RequestHandler): void {
+export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: RequestHandler, optionalAuth?: RequestHandler): void {
+  const chatAuth = optionalAuth || ((_req: any, _res: any, next: any) => next());
   app.post("/api/summarize", requireAuth, async (request, response, next) => {
     try {
       const { text, length, difficulty, style } = parseSummaryRequest(request.body);
@@ -44,7 +45,7 @@ export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: Request
   app.post("/api/mindmap/generate", requireAuth, handleMindMap);
 
 
-  app.post("/api/ai/chat", requireAuth, async (request, response, next) => {
+  app.post("/api/ai/chat", chatAuth, async (request, response, next) => {
     try {
       const input = parseChatRequest(request.body);
       const reply = await ai.chat(input);

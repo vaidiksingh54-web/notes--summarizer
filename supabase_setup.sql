@@ -84,3 +84,4 @@ DROP POLICY IF EXISTS "Service Role Access Notifications" ON public.notification
 CREATE POLICY "Service Role Access Notifications" ON public.notifications FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- End of Supabase Setup Script
+
