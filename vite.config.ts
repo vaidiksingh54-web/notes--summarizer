@@ -1,9 +1,30 @@
-import path from 'path';
-import { defineConfig } from 'vite';
+import fs from 'node:fs';
+import path from 'node:path';
+import { defineConfig, type Plugin } from 'vite';
+
+function copyStaticAssets(): Plugin {
+  return {
+    name: 'copy-static-assets',
+    closeBundle() {
+      const distDir = path.resolve(import.meta.dirname, 'dist');
+      for (const directory of ['css', 'js']) {
+        const src = path.resolve(import.meta.dirname, 'frontend', directory);
+        const dest = path.resolve(distDir, directory);
+        if (fs.existsSync(src)) {
+          fs.cpSync(src, dest, { recursive: true });
+        }
+      }
+      const fav = path.resolve(import.meta.dirname, 'frontend/favicon.svg');
+      if (fs.existsSync(fav)) {
+        fs.copyFileSync(fav, path.resolve(distDir, 'favicon.svg'));
+      }
+    },
+  };
+}
 
 export default defineConfig(() => {
   return {
-    plugins: [],
+    plugins: [copyStaticAssets()],
     root: path.resolve(import.meta.dirname, 'frontend'),
     resolve: {
       alias: {
@@ -40,10 +61,7 @@ export default defineConfig(() => {
       proxy: {
         '/api': 'http://127.0.0.1:5000',
       },
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
   };

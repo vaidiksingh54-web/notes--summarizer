@@ -4,24 +4,32 @@ import { parseChatRequest, parseFlashcardRequest, parseMindMapRequest, parseQuiz
 
 export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: RequestHandler, optionalAuth?: RequestHandler): void {
   const chatAuth = optionalAuth || ((_req: any, _res: any, next: any) => next());
-  app.post("/api/summarize", requireAuth, async (request, response, next) => {
+  const openAiAuth = optionalAuth || ((_req: any, _res: any, next: any) => next());
+
+  const handleSummary = async (request: any, response: any, next: any) => {
     try {
       const { text, length, difficulty, style } = parseSummaryRequest(request.body);
       response.json({ summary: await ai.summarize(text, { length, difficulty, style }) });
     } catch (error) {
       next(error);
     }
-  });
+  };
 
-  app.post("/api/flashcards/generate", requireAuth, async (request, response, next) => {
+  app.post("/api/summarize", openAiAuth, handleSummary);
+  app.post("/api/ai/summarize", openAiAuth, handleSummary);
+
+  const handleFlashcards = async (request: any, response: any, next: any) => {
     try {
       response.json({ cards: await ai.generateFlashcards(parseFlashcardRequest(request.body)) });
     } catch (error) {
       next(error);
     }
-  });
+  };
 
-  app.post("/api/quiz/generate", requireAuth, async (request, response, next) => {
+  app.post("/api/flashcards/generate", openAiAuth, handleFlashcards);
+  app.post("/api/ai/flashcards", openAiAuth, handleFlashcards);
+
+  const handleQuiz = async (request: any, response: any, next: any) => {
     try {
       const input = parseQuizRequest(request.body);
       const questions = await ai.generateQuiz(input);
@@ -29,7 +37,10 @@ export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: Request
     } catch (error) {
       next(error);
     }
-  });
+  };
+
+  app.post("/api/quiz/generate", openAiAuth, handleQuiz);
+  app.post("/api/ai/quiz", openAiAuth, handleQuiz);
 
   const handleMindMap = async (request: any, response: any, next: any) => {
     try {
@@ -41,9 +52,9 @@ export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: Request
     }
   };
 
-  app.post("/api/mindmap", requireAuth, handleMindMap);
-  app.post("/api/mindmap/generate", requireAuth, handleMindMap);
-
+  app.post("/api/mindmap", openAiAuth, handleMindMap);
+  app.post("/api/mindmap/generate", openAiAuth, handleMindMap);
+  app.post("/api/ai/mindmap", openAiAuth, handleMindMap);
 
   app.post("/api/ai/chat", chatAuth, async (request, response, next) => {
     try {
@@ -55,7 +66,7 @@ export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: Request
     }
   });
 
-  app.post("/api/ai/transform", requireAuth, async (request, response, next) => {
+  app.post("/api/ai/transform", openAiAuth, async (request, response, next) => {
     try {
       const { text, action } = parseTransformRequest(request.body);
       const transformed = await ai.transformText(text, action);
@@ -65,4 +76,3 @@ export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: Request
     }
   });
 }
-

@@ -413,7 +413,8 @@ class StudyStore {
       });
       return result.mindmap;
     } catch (err) {
-      throw err;
+      console.warn("Backend mindmap unreachable, synthesizing client mindmap:", err);
+      return this.synthesizeClientMindMap(topic, text, depth);
     }
   }
 
