@@ -3,6 +3,18 @@
  */
 
 const TOKEN_KEY = "cogni_session_token";
+
+const EMPTY_USER = {
+  name: "Student",
+  email: "",
+  phone: "",
+  college: "",
+  course: "",
+  age: 18,
+  bio: "",
+  avatar: "ST",
+  isLoggedIn: false
+};
 // Reliable current page identifier (normalizes /login, /login.html, /login/ to "login")
 function currentPage() {
   if (typeof window === "undefined" || !window.location) return "index";

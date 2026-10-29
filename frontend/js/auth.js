@@ -127,6 +127,14 @@ async function triggerGoogleSignIn(btn) {
 }
 
 async function executeGoogleStudentAuth(btn, origText) {
+  if (!window.store) {
+    window.showToast("Initializing application store. Please retry in a moment.", "info");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origText;
+    }
+    return;
+  }
   window.showToast("Authenticating verified student profile...", "info");
   try {
     const demoPayload = {
@@ -163,6 +171,10 @@ async function executeGoogleStudentAuth(btn, origText) {
 async function handleGoogleCredentialResponse(response) {
   if (!response || !response.credential) {
     window.showToast("No Google credential token returned.", "error");
+    return;
+  }
+  if (!window.store) {
+    window.showToast("Initializing application store. Please retry in a moment.", "info");
     return;
   }
 
@@ -207,6 +219,10 @@ function initQuickDemoAccess() {
   if (!demoBtn) return;
 
   demoBtn.addEventListener("click", async () => {
+    if (!window.store) {
+      window.showToast("Initializing application store. Please retry in a moment.", "info");
+      return;
+    }
     demoBtn.disabled = true;
     demoBtn.textContent = "Loading Demo...";
     window.showToast("Launching instant Student Workspace demo...", "info");
@@ -256,6 +272,10 @@ function initLoginForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (!window.store) {
+      window.showToast("Initializing application store. Please retry in a moment.", "info");
+      return;
+    }
     const email = document.getElementById("login-email")?.value.trim();
     const password = document.getElementById("login-password")?.value;
     const submitBtn = document.getElementById("btn-login-submit");
@@ -292,6 +312,10 @@ function initSignupForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (!window.store) {
+      window.showToast("Initializing application store. Please retry in a moment.", "info");
+      return;
+    }
     const name = document.getElementById("signup-name")?.value.trim();
     const email = document.getElementById("signup-email")?.value.trim();
     const college = document.getElementById("signup-college")?.value.trim();
