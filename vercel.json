@@ -1,5 +1,16 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/signup", "destination": "/signup.html" },
+    { "source": "/notes", "destination": "/notes.html" },
+    { "source": "/flashcards", "destination": "/flashcards.html" },
+    { "source": "/quiz", "destination": "/quiz.html" },
+    { "source": "/mindmap", "destination": "/mindmap.html" },
+    { "source": "/library", "destination": "/library.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/profile", "destination": "/profile.html" }
+  ]
 }
