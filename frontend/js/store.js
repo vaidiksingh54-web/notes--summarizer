@@ -3,56 +3,23 @@
  */
 
 const TOKEN_KEY = "cogni_session_token";
-const PUBLIC_PAGES = new Set([
-  "",
-  "index.html",
-  "login.html",
-  "signup.html",
-  "privacy.html",
-  "terms.html",
-  "cookies.html",
-  "accessibility.html",
-  "disclaimer.html",
-  "help.html",
-  "404.html",
-  "500.html",
-]);
-
-const EMPTY_USER = {
-  name: "Student",
-  email: "",
-  phone: "",
-  college: "",
-  course: "",
-  age: 18,
-  bio: "",
-  avatar: "ST",
-  isLoggedIn: false
-};
-
+// Reliable current page identifier (normalizes /login, /login.html, /login/ to "login")
 function currentPage() {
-  return (window.location.pathname.split("/").pop() || "index.html").toLowerCase();
+  if (typeof window === "undefined" || !window.location) return "index";
+  const clean = window.location.pathname.replace(/\/+$/, "");
+  const segment = (clean.split("/").pop() || "index").toLowerCase();
+  return segment.replace(/\.html$/i, "");
 }
 
-function getApiBaseUrl() {
-  // If running locally on localhost or 127.0.0.1, always prioritize local backend
-  if (typeof window !== "undefined" && window.location) {
-    const host = window.location.hostname;
-    if (host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0") {
-      return "";
-    }
-  }
-  if (typeof localStorage !== "undefined" && localStorage.getItem("cogni_api_url")) {
-    return localStorage.getItem("cogni_api_url").replace(/\/$/, "");
-  }
-  if (typeof window !== "undefined" && window.COGNISTUDY_API_URL) {
-    return window.COGNISTUDY_API_URL.replace(/\/$/, "");
-  }
-  return "";
-}
+// Only sensitive student areas require an active login session
+const PROTECTED_PAGES = new Set(["dashboard", "profile"]);
 
-if (!PUBLIC_PAGES.has(currentPage()) && !localStorage.getItem(TOKEN_KEY)) {
-  window.location.replace("login.html");
+// Safety guard: NEVER redirect if on public pages, auth pages, or study tools
+if (typeof window !== "undefined") {
+  const current = currentPage();
+  if (PROTECTED_PAGES.has(current) && !localStorage.getItem(TOKEN_KEY)) {
+    window.location.replace("login.html");
+  }
 }
 
 class StudyStore {
@@ -88,7 +55,7 @@ class StudyStore {
       if (event.key === TOKEN_KEY) {
         if (!event.newValue) {
           this.user = { ...EMPTY_USER };
-          if (!PUBLIC_PAGES.has(currentPage())) window.location.replace("login.html");
+          if (PROTECTED_PAGES.has(currentPage())) window.location.replace("login.html");
         } else {
           this.loadFromApi();
         }
@@ -120,7 +87,7 @@ class StudyStore {
     } catch (error) {
       if (String(error.message).includes("Sign in") || String(error.message).includes("UNAUTHENTICATED")) {
         localStorage.removeItem(TOKEN_KEY);
-        if (!PUBLIC_PAGES.has(currentPage())) window.location.replace("login.html");
+        if (PROTECTED_PAGES.has(currentPage())) window.location.replace("login.html");
         return;
       }
       console.warn("Backend unavailable.", error);
@@ -160,7 +127,7 @@ class StudyStore {
 
     if (response.status === 204) return null;
     const data = await response.json().catch(() => ({}));
-    if (response.status === 401 && !PUBLIC_PAGES.has(currentPage())) {
+    if (response.status === 401 && PROTECTED_PAGES.has(currentPage())) {
       localStorage.removeItem(TOKEN_KEY);
       window.location.replace("login.html");
     }
