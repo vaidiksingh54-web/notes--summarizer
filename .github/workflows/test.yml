@@ -1,0 +1,34 @@
+name: CogniStudy CI - Automated Testing & Build
+
+on:
+  push:
+    branches: [ main, sam ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Lint, Integration Tests & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Type Check & Linting (tsc)
+        run: npm run lint
+
+      - name: Run Automated Test Suites (11 Tests)
+        run: npm test
+
+      - name: Production Bundle Build (Vite)
+        run: npm run build
