@@ -23,6 +23,22 @@ function currentPage() {
   return segment.replace(/\.html$/i, "");
 }
 
+function getApiBaseUrl() {
+  if (typeof window !== "undefined" && window.location) {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0") {
+      return "";
+    }
+  }
+  if (typeof localStorage !== "undefined" && localStorage.getItem("cogni_api_url")) {
+    return localStorage.getItem("cogni_api_url").replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined" && window.COGNISTUDY_API_URL) {
+    return window.COGNISTUDY_API_URL.replace(/\/$/, "");
+  }
+  return "https://notes-summarizer-tpa1.onrender.com";
+}
+
 // Only sensitive student areas require an active login session
 const PROTECTED_PAGES = new Set(["dashboard", "profile"]);
 
