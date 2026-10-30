@@ -12,9 +12,14 @@ window.openAiAssistant = function(prefillPrompt) {
   }
   if (panel) {
     panel.classList.add("active");
+    if (typeof window.refreshAiContextBanner === "function") {
+      window.refreshAiContextBanner();
+    }
     const input = document.getElementById("ai-user-input");
     if (input) {
-      if (prefillPrompt) input.value = prefillPrompt;
+      if (typeof prefillPrompt === "string" && prefillPrompt.trim()) {
+        input.value = prefillPrompt;
+      }
       setTimeout(() => input.focus(), 60);
     }
   }
@@ -434,15 +439,31 @@ function initAiAssistantWidget() {
   function getAvailableNotesText() {
     if (typeof window.getCurrentNoteContent === "function") {
       const text = window.getCurrentNoteContent();
-      if (text && text.length > 20) return text;
-    }
-    const notesInput = document.getElementById("notes-source-input");
-    if (notesInput && notesInput.value.trim().length > 20) {
-      return notesInput.value.trim();
+      if (text && text.length > 10) return text;
     }
     const editor = document.getElementById("notes-editor-content");
-    if (editor && editor.innerText.trim().length > 20) {
+    if (editor && editor.innerText.trim().length > 10) {
       return editor.innerText.trim();
+    }
+    const candidates = [
+      document.getElementById("notes-source-input"),
+      document.getElementById("mm-source-text"),
+      document.getElementById("demo-notes-input")
+    ];
+    for (const el of candidates) {
+      if (el && el.value && el.value.trim().length > 10) {
+        return el.value.trim();
+      }
+    }
+    if (window.mindMapApp && window.mindMapApp.rootData) {
+      return `Mind Map Topic: ${window.mindMapApp.rootData.title}\nStructure: ${JSON.stringify(window.mindMapApp.rootData).slice(0, 6000)}`;
+    }
+    const topicEl =
+      document.getElementById("fc-topic-input") ||
+      document.getElementById("quiz-topic-input") ||
+      document.getElementById("mm-topic-input");
+    if (topicEl && topicEl.value && topicEl.value.trim().length > 1) {
+      return `Current Study Topic: ${topicEl.value.trim()}`;
     }
     return "";
   }
@@ -456,6 +477,8 @@ function initAiAssistantWidget() {
     }
   }
 
+  window.refreshAiContextBanner = checkContextAvailability;
+
   toggleBtn.addEventListener("click", () => {
     panel.classList.toggle("active");
     if (panel.classList.contains("active")) {
@@ -467,9 +490,7 @@ function initAiAssistantWidget() {
   document.querySelectorAll(".nav-link-assistant, .sidebar-item-assistant, [data-open-assistant]").forEach(el => {
     el.addEventListener("click", (e) => {
       e.preventDefault();
-      panel.classList.add("active");
-      checkContextAvailability();
-      input?.focus();
+      window.openAiAssistant();
     });
   });
 
@@ -502,6 +523,11 @@ function initAiAssistantWidget() {
   summarizeContextBtn.addEventListener("click", () => {
     input.value = "Please summarize these notes thoroughly with main definitions, core principles, and bullet points.";
     sendMessage();
+  });
+
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = `${Math.min(input.scrollHeight, 120)}px`;
   });
 
   input.addEventListener("keydown", (e) => {
@@ -572,10 +598,9 @@ function initAiAssistantWidget() {
     copyBtn.className = "ai-msg-action-btn";
     copyBtn.innerHTML = "📋 Copy";
     copyBtn.onclick = () => {
-      navigator.clipboard.writeText(text).then(() => {
-        copyBtn.textContent = "✓ Copied!";
-        setTimeout(() => { copyBtn.innerHTML = "📋 Copy"; }, 1800);
-      });
+      window.copyToClipboard(text, "AI response copied!");
+      copyBtn.textContent = "✓ Copied!";
+      setTimeout(() => { copyBtn.innerHTML = "📋 Copy"; }, 1800);
     };
     footer.appendChild(copyBtn);
 

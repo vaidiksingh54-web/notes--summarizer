@@ -1,18 +1,17 @@
 import express, { type ErrorRequestHandler } from "express";
-import path from "node:path";
-import { ApiError, type StudyAi } from "./types.js";
-import { GeminiStudyAi } from "./services/gemini.js";
-import { InMemoryRepository } from "./repository/databaseRepository.js";
-import { SqliteRepository } from "./repository/sqliteRepository.js";
-import { SupabaseRepository } from "./repository/supabaseRepository.js";
-import type { Repository } from "./repository/repository.js";
-import { createRequireAuth, createOptionalAuth, studentIdOf } from "./services/auth.js";
-import { registerAiRoutes } from "./routes/ai.js";
-import { registerAuthRoutes } from "./routes/auth.js";
-import { registerItemRoutes } from "./routes/items.js";
-import { registerProfileRoutes } from "./routes/profile.js";
+import { ApiError, type StudyAi } from "./types.ts";
+import { GeminiStudyAi } from "./services/gemini.ts";
+import { InMemoryRepository } from "./repository/databaseRepository.ts";
+import { SqliteRepository } from "./repository/sqliteRepository.ts";
+import { SupabaseRepository } from "./repository/supabaseRepository.ts";
+import type { Repository } from "./repository/repository.ts";
+import { createRequireAuth, createOptionalAuth, studentIdOf } from "./services/auth.ts";
+import { registerAiRoutes } from "./routes/ai.ts";
+import { registerAuthRoutes } from "./routes/auth.ts";
+import { registerItemRoutes } from "./routes/items.ts";
+import { registerProfileRoutes } from "./routes/profile.ts";
 
-import { securityHeaders, createRateLimiter } from "./middleware/security.js";
+import { securityHeaders, createRateLimiter } from "./middleware/security.ts";
 
 export function createApp(options: { repository?: Repository; ai?: StudyAi } = {}) {
   let repository: Repository;
@@ -32,7 +31,12 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
       repository = new SqliteRepository();
     }
   } else {
-    repository = new SqliteRepository();
+    try {
+      repository = new SqliteRepository();
+    } catch (err) {
+      console.warn("SQLite initialization failed, falling back to InMemoryRepository:", err);
+      repository = new InMemoryRepository();
+    }
   }
 
 

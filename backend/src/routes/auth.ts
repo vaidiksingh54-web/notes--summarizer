@@ -1,8 +1,8 @@
 import type { Express } from "express";
-import { ApiError, type Profile } from "../types.js";
-import type { Repository } from "../repository/repository.js";
-import { authPayload, bearerToken, hashPassword, verifyPassword } from "../services/auth.js";
-import { parseLogin, parseSignup, studentAvatar } from "../validation.js";
+import { ApiError, type Profile } from "../types.ts";
+import type { Repository } from "../repository/repository.ts";
+import { authPayload, bearerToken, hashPassword, verifyPassword } from "../services/auth.ts";
+import { parseLogin, parseSignup, studentAvatar } from "../validation.ts";
 
 export function registerAuthRoutes(app: Express, repository: Repository): void {
   app.post("/api/signup", async (request, response, next) => {

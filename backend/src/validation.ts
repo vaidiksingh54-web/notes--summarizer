@@ -1,4 +1,4 @@
-import { ApiError, type Activity, type ChatRequest, type FlashcardRequest, type MindMapNode, type MindMapRequest, type Profile, type QuizQuestion, type QuizRequest, type StudyItem } from "./types.js";
+import { ApiError, type Activity, type ChatRequest, type FlashcardRequest, type MindMapNode, type MindMapRequest, type Profile, type QuizQuestion, type QuizRequest, type StudyItem } from "./types.ts";
 
 const object = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -143,8 +143,8 @@ export function parseGeneratedCards(
   const cards = value.slice(0, expectedCount).map((entry, index) => {
     const card = requireObject(entry, `cards[${index}]`);
     return {
-      question: stringField(card.question, `cards[${index}].question`, { required: true, max: 2_000 })!,
-      answer: stringField(card.answer, `cards[${index}].answer`, { required: true, max: 5_000 })!,
+      question: stringField(card.question ?? card.front, `cards[${index}].question`, { required: true, max: 2_000 })!,
+      answer: stringField(card.answer ?? card.back, `cards[${index}].answer`, { required: true, max: 5_000 })!,
     };
   });
   return cards;
@@ -182,8 +182,9 @@ export function parseGeneratedQuiz(
     if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 6) {
       throw new ApiError(502, "GEMINI_EMPTY_RESPONSE", `questions[${index}].options must contain between 2 and 6 choices.`);
     }
-    const correct = typeof q.correct === "number" && Number.isInteger(q.correct) && q.correct >= 0 && q.correct < q.options.length
-      ? q.correct
+    const rawCorrect = typeof q.correct === "number" ? q.correct : (typeof q.answer === "number" ? q.answer : 0);
+    const correct = Number.isInteger(rawCorrect) && rawCorrect >= 0 && rawCorrect < q.options.length
+      ? rawCorrect
       : 0;
     return {
       question: stringField(q.question, `questions[${index}].question`, { required: true, max: 2_000 })!,
@@ -339,11 +340,11 @@ export function parseProfile(value: unknown, current: Profile): Profile {
     name: stringField(input.name, "name", { required: true, max: 100 })!,
     email: normalizeEmail(stringField(input.email, "email", { required: true, max: 254 })!),
     phone: stringField(input.phone ?? "", "phone", { max: 40 }) ?? "",
-    college: stringField(input.college, "college", { required: true, max: 150 })!,
-    course: stringField(input.course, "course", { required: true, max: 150 })!,
+    college: stringField(input.college ?? current.college ?? "", "college", { max: 150 }) ?? "",
+    course: stringField(input.course ?? current.course ?? "", "course", { max: 150 }) ?? "",
     age: input.age === undefined ? current.age : numberField(input.age, "age", 0, 130),
-    bio: stringField(input.bio, "bio", { required: true, max: 1_000 })!,
-    avatar: stringField(input.avatar, "avatar", { required: true, max: 4 })!,
+    bio: stringField(input.bio ?? current.bio ?? "", "bio", { max: 1_000 }) ?? "",
+    avatar: stringField(input.avatar ?? current.avatar ?? "ST", "avatar", { required: true, max: 4 })!,
   };
   if (!isValidEmail(profile.email)) {
     throw new ApiError(400, "INVALID_FIELD", "email must be a valid email address.");

@@ -29,10 +29,16 @@ function initQuizGenerator() {
 
   if (generateBtn) {
     generateBtn.addEventListener("click", async () => {
-      const topic = topicInput?.value.trim() || "Computer Science & Digital Logic";
+      const topic = topicInput?.value.trim() || "General Studies";
       const count = parseInt(countSelect?.value || "5", 10);
       const difficulty = document.getElementById("quiz-difficulty")?.value || "medium";
-      const sourceText = sessionStorage.getItem("cogni_prep_quiz_text") || undefined;
+      const prepTopic = sessionStorage.getItem("cogni_prep_quiz");
+      const prepText = sessionStorage.getItem("cogni_prep_quiz_text");
+      const sourceText = prepText && prepTopic && prepTopic.trim() === topic ? prepText : undefined;
+      if (prepText) {
+        sessionStorage.removeItem("cogni_prep_quiz");
+        sessionStorage.removeItem("cogni_prep_quiz_text");
+      }
 
       const emptyView = document.getElementById("quiz-empty-view");
       const loadingView = document.getElementById("quiz-loading-view");
@@ -196,10 +202,16 @@ function renderCurrentQuestion() {
   });
 }
 
+function getCorrectOptionIndex(q) {
+  if (typeof q.correct === "number") return q.correct;
+  if (typeof q.answer === "number") return q.answer;
+  return 0;
+}
+
 function calculateScoreString() {
   let correctCount = 0;
   currentQuiz.forEach((q, idx) => {
-    if (userAnswers[idx] === q.correct) correctCount++;
+    if (userAnswers[idx] === getCorrectOptionIndex(q)) correctCount++;
   });
   return `${correctCount}/${currentQuiz.length}`;
 }
@@ -214,7 +226,7 @@ function finishQuiz() {
   let wrong = 0;
 
   currentQuiz.forEach((q, idx) => {
-    if (userAnswers[idx] === q.correct) {
+    if (userAnswers[idx] === getCorrectOptionIndex(q)) {
       correct++;
     } else {
       wrong++;
@@ -243,7 +255,8 @@ function finishQuiz() {
   if (reviewContainer) {
     reviewContainer.innerHTML = currentQuiz.map((q, idx) => {
       const userChoice = userAnswers[idx];
-      const isCorrect = userChoice === q.correct;
+      const correctIdx = getCorrectOptionIndex(q);
+      const isCorrect = userChoice === correctIdx;
       return `
         <div class="glass-card" style="padding: 18px; margin-bottom: 14px; border-left: 4px solid ${isCorrect ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -258,11 +271,11 @@ function finishQuiz() {
           ${!isCorrect ? `
             <div style="font-size: 0.88rem; margin-bottom: 8px;">
               <span style="color: var(--text-muted);">Correct answer:</span> 
-              <span style="color: #34d399; font-weight: 500;">${escapeHtml(q.options[q.correct])}</span>
+              <span style="color: #34d399; font-weight: 500;">${escapeHtml(q.options[correctIdx] || "")}</span>
             </div>
           ` : ''}
           <div style="font-size: 0.82rem; color: var(--text-faint); background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: var(--radius-sm); margin-top: 6px;">
-            💡 <strong>Explanation:</strong> ${escapeHtml(q.explanation)}
+            💡 <strong>Explanation:</strong> ${escapeHtml(q.explanation || "")}
           </div>
         </div>
       `;

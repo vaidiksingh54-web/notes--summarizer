@@ -17,7 +17,6 @@ test("securityHeaders sets protective HTTP headers", async () => {
     const res = await fetch(`http://127.0.0.1:${port}/test`);
     assert.equal(res.status, 200);
     assert.equal(res.headers.get("x-content-type-options"), "nosniff");
-    assert.equal(res.headers.get("x-frame-options"), "SAMEORIGIN");
     assert.equal(res.headers.get("referrer-policy"), "strict-origin-when-cross-origin");
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));

@@ -1,8 +1,8 @@
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import type { Request, RequestHandler } from "express";
-import { ApiError, type Profile } from "../types.js";
-import type { Repository } from "../repository/repository.js";
+import { ApiError, type Profile } from "../types.ts";
+import type { Repository } from "../repository/repository.ts";
 
 declare module "express-serve-static-core" {
   interface Request {

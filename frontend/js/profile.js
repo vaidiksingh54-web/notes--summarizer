@@ -116,21 +116,17 @@ function initBackendConnectionCard() {
   input.value = savedUrl;
 
   async function checkHealth(url) {
-    if (!url) {
-      if (badge) {
-        badge.className = "badge badge-gray";
-        badge.textContent = "Not Configured";
-      }
-      return null;
-    }
     if (badge) {
       badge.className = "badge badge-cyan";
       badge.textContent = "Checking...";
     }
     try {
-      const cleanUrl = url.replace(/\/+$/, "");
-      const res = await fetch(`${cleanUrl}/api/health`, { method: "GET", signal: AbortSignal.timeout(35000) });
+      const cleanUrl = (url || "").trim().replace(/\/+$/, "");
+      const endpoint = cleanUrl ? `${cleanUrl}/api/health` : "/api/health";
+      const res = await fetch(endpoint, { method: "GET", signal: AbortSignal.timeout(15000) });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) throw new Error("Static server");
       const data = await res.json();
       if (badge) {
         badge.className = "badge badge-green";
@@ -141,34 +137,25 @@ function initBackendConnectionCard() {
       return data;
     } catch (_err) {
       if (badge) {
-        badge.className = "badge badge-red";
-        badge.style.background = "rgba(239, 68, 68, 0.2)";
-        badge.style.color = "#ef4444";
-        badge.textContent = "Offline / Sleeping";
+        badge.className = "badge badge-gray";
+        badge.style.background = "";
+        badge.style.color = "";
+        badge.textContent = url ? "Offline / Unreachable" : "Local Cache Mode";
       }
       return null;
     }
   }
 
-  if (savedUrl) {
-    checkHealth(savedUrl);
-  } else if (badge) {
-    badge.className = "badge badge-gray";
-    badge.textContent = "Not Configured";
-  }
+  checkHealth(savedUrl);
 
   testBtn?.addEventListener("click", async () => {
     const url = input.value.trim();
-    if (!url) {
-      window.showToast("Enter your Render backend URL first.", "error");
-      return;
-    }
     testBtn.disabled = true;
     testBtn.textContent = "Pinging...";
     if (resultDiv) {
       resultDiv.style.display = "block";
       resultDiv.style.color = "var(--text-muted)";
-      resultDiv.innerHTML = "Connecting to backend... If Render was asleep, this may take up to 45s.";
+      resultDiv.innerHTML = "Connecting to backend API...";
     }
     const health = await checkHealth(url);
     testBtn.disabled = false;
@@ -182,21 +169,23 @@ function initBackendConnectionCard() {
     } else {
       if (resultDiv) {
         resultDiv.style.color = "#ef4444";
-        resultDiv.innerHTML = `✕ Could not reach ${url}. Ensure the Render service is deployed and active.`;
+        resultDiv.innerHTML = url
+          ? `✕ Could not reach ${url}. Verify the backend server URL is active.`
+          : `✕ Integrated API not detected on this origin (running in local cache mode).`;
       }
-      window.showToast("Failed to reach backend.", "error");
+      window.showToast("Backend API not reachable.", "error");
     }
   });
 
   saveBtn?.addEventListener("click", async () => {
     const url = input.value.trim().replace(/\/+$/, "");
-    if (!url) {
-      window.showToast("Please enter a valid URL.", "error");
-      return;
+    if (url) {
+      localStorage.setItem("cogni_api_url", url);
+    } else {
+      localStorage.removeItem("cogni_api_url");
     }
-    localStorage.setItem("cogni_api_url", url);
     window.COGNISTUDY_API_URL = url;
-    window.showToast("Backend URL saved! Reloading data...", "success");
+    window.showToast("Backend configuration saved!", "success");
     await checkHealth(url);
     if (window.store) {
       await window.store.loadFromApi();
@@ -206,13 +195,10 @@ function initBackendConnectionCard() {
 
   resetBtn?.addEventListener("click", () => {
     localStorage.removeItem("cogni_api_url");
-    input.value = window.COGNISTUDY_API_URL || "";
-    if (window.COGNISTUDY_API_URL) checkHealth(window.COGNISTUDY_API_URL);
-    if (badge) {
-      badge.className = "badge badge-gray";
-      badge.textContent = "Not Configured";
-    }
+    window.COGNISTUDY_API_URL = "";
+    input.value = "";
+    checkHealth("");
     if (resultDiv) resultDiv.style.display = "none";
-    window.showToast("Backend URL reset.", "info");
+    window.showToast("Backend URL reset to integrated server.", "info");
   });
 }

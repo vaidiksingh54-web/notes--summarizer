@@ -28,7 +28,13 @@ function initFlashcardGenerator() {
       const topic = topicInput?.value.trim();
       const count = parseInt(cardCountSelect?.value || "6", 10);
       const difficulty = document.getElementById("fc-difficulty")?.value || "medium";
-      const sourceText = sessionStorage.getItem("cogni_prep_flashcards_text") || undefined;
+      const prepTopic = sessionStorage.getItem("cogni_prep_flashcards");
+      const prepText = sessionStorage.getItem("cogni_prep_flashcards_text");
+      const sourceText = prepText && prepTopic && prepTopic.trim() === topic ? prepText : undefined;
+      if (prepText) {
+        sessionStorage.removeItem("cogni_prep_flashcards");
+        sessionStorage.removeItem("cogni_prep_flashcards_text");
+      }
 
       if (!topic) {
         window.showToast("Enter a topic first.", "error");
@@ -179,8 +185,8 @@ function updateCardDisplay() {
 
   const card = currentDeck[currentIndex];
   document.getElementById("card-index-indicator").textContent = `CARD ${currentIndex + 1} / ${currentDeck.length}`;
-  document.getElementById("fc-front-question").textContent = card.question;
-  document.getElementById("fc-back-answer").textContent = card.answer;
+  document.getElementById("fc-front-question").textContent = card.question || card.front || "";
+  document.getElementById("fc-back-answer").textContent = card.answer || card.back || "";
 
   const prevBtn = document.getElementById("btn-prev-card");
   const nextBtn = document.getElementById("btn-next-card");

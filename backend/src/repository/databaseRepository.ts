@@ -6,8 +6,8 @@ import type {
   PublicStudent,
   StoredStudent,
   StudyItem,
-} from "../types.js";
-import type { Repository } from "./repository.js";
+} from "../types.ts";
+import type { Repository } from "./repository.ts";
 
 const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
 

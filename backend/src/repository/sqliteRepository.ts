@@ -1,4 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
+import { createRequire } from "node:module";
 import { randomBytes } from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
@@ -9,27 +9,49 @@ import type {
   PublicStudent,
   StoredStudent,
   StudyItem,
-} from "../types.js";
-import type { Repository } from "./repository.js";
+} from "../types.ts";
+import type { Repository } from "./repository.ts";
+import { InMemoryRepository } from "./databaseRepository.ts";
 
 const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
 
+interface SqliteStatement {
+  run(...params: unknown[]): { changes: number | bigint };
+  get(...params: unknown[]): unknown;
+  all(...params: unknown[]): unknown[];
+}
+
+interface SqliteDb {
+  exec(sql: string): void;
+  prepare(sql: string): SqliteStatement;
+  close(): void;
+}
+
 export class SqliteRepository implements Repository {
-  private db: DatabaseSync;
+  private db: SqliteDb | null = null;
+  private memoryFallback: InMemoryRepository | null = null;
 
   constructor(dbPath?: string) {
-    const resolvedPath = dbPath || process.env.DATABASE_PATH || path.resolve(process.cwd(), "backend/study_app.db");
-    if (resolvedPath !== ":memory:") {
-      const dir = path.dirname(resolvedPath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+    try {
+      const req = createRequire(import.meta.url);
+      const { DatabaseSync } = req("node:sqlite") as { DatabaseSync: new (p: string) => SqliteDb };
+      const resolvedPath = dbPath || process.env.DATABASE_PATH || path.resolve(process.cwd(), "backend/study_app.db");
+      if (resolvedPath !== ":memory:") {
+        const dir = path.dirname(resolvedPath);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
       }
+      this.db = new DatabaseSync(resolvedPath);
+      this.initTables();
+    } catch (err) {
+      console.warn("SQLite unavailable, using in-memory repository fallback:", err instanceof Error ? err.message : err);
+      this.memoryFallback = new InMemoryRepository();
     }
-    this.db = new DatabaseSync(resolvedPath);
-    this.initTables();
   }
 
   private initTables(): void {
+    if (!this.db) return;
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS students (
         id TEXT PRIMARY KEY,
@@ -78,6 +100,7 @@ export class SqliteRepository implements Repository {
   }
 
   createStudent(email: string, passwordHash: string, profile: Profile): PublicStudent {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.createStudent(email, passwordHash, profile);
     const id = `student-${randomBytes(8).toString("hex")}`;
     this.db.prepare(
       "INSERT INTO students (id, email, password_hash, profile) VALUES (?, ?, ?, ?)"
@@ -98,6 +121,7 @@ export class SqliteRepository implements Repository {
   }
 
   findStudentByEmail(email: string): StoredStudent | undefined {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.findStudentByEmail(email);
     const row = this.db.prepare(
       "SELECT id, email, password_hash, profile FROM students WHERE lower(email) = lower(?)"
     ).get(email) as { id: string; email: string; password_hash: string; profile: string } | undefined;
@@ -112,6 +136,7 @@ export class SqliteRepository implements Repository {
   }
 
   getStudent(id: string): PublicStudent | undefined {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.getStudent(id);
     const row = this.db.prepare(
       "SELECT id, profile FROM students WHERE id = ?"
     ).get(id) as { id: string; profile: string } | undefined;
@@ -124,6 +149,7 @@ export class SqliteRepository implements Repository {
   }
 
   createSession(studentId: string): string {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.createSession(studentId);
     const token = randomBytes(32).toString("hex");
     const expiresAt = Date.now() + SESSION_MS;
     this.db.prepare(
@@ -133,7 +159,7 @@ export class SqliteRepository implements Repository {
   }
 
   getStudentIdForSession(token: string): string | undefined {
-
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.getStudentIdForSession(token);
     const row = this.db.prepare(
       "SELECT student_id, expires_at FROM sessions WHERE token = ?"
     ).get(token) as { student_id: string; expires_at: number } | undefined;
@@ -147,11 +173,13 @@ export class SqliteRepository implements Repository {
   }
 
   deleteSession(token: string): boolean {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.deleteSession(token);
     const result = this.db.prepare("DELETE FROM sessions WHERE token = ?").run(token);
     return Number(result.changes) > 0;
   }
 
   listItems(studentId: string, filter = "all"): StudyItem[] {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.listItems(studentId, filter);
     let query = "SELECT data FROM study_items WHERE student_id = ?";
     const params: (string | number)[] = [studentId];
 
@@ -169,6 +197,7 @@ export class SqliteRepository implements Repository {
   }
 
   getItem(studentId: string, id: string): StudyItem | undefined {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.getItem(studentId, id);
     const row = this.db.prepare(
       "SELECT data FROM study_items WHERE student_id = ? AND id = ?"
     ).get(studentId, id) as { data: string } | undefined;
@@ -178,6 +207,7 @@ export class SqliteRepository implements Repository {
   }
 
   createItem(studentId: string, item: StudyItem): StudyItem {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.createItem(studentId, item);
     const isFav = item.isFavorite ? 1 : 0;
     this.db.prepare(
       "INSERT INTO study_items (id, student_id, type, is_favorite, data) VALUES (?, ?, ?, ?, ?)"
@@ -186,6 +216,7 @@ export class SqliteRepository implements Repository {
   }
 
   updateItem(studentId: string, id: string, changes: Partial<StudyItem>): StudyItem | undefined {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.updateItem(studentId, id, changes);
     const existing = this.getItem(studentId, id);
     if (!existing) return undefined;
 
@@ -200,6 +231,7 @@ export class SqliteRepository implements Repository {
   }
 
   deleteItem(studentId: string, id: string): boolean {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.deleteItem(studentId, id);
     const result = this.db.prepare(
       "DELETE FROM study_items WHERE student_id = ? AND id = ?"
     ).run(studentId, id);
@@ -207,12 +239,14 @@ export class SqliteRepository implements Repository {
   }
 
   getProfile(studentId: string): Profile | undefined {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.getProfile(studentId);
     const row = this.db.prepare("SELECT profile FROM students WHERE id = ?").get(studentId) as { profile: string } | undefined;
     if (!row) return undefined;
     return JSON.parse(row.profile);
   }
 
   updateProfile(studentId: string, profile: Profile): Profile | undefined {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.updateProfile(studentId, profile);
     const existing = this.getStudent(studentId);
     if (!existing) return undefined;
 
@@ -224,6 +258,7 @@ export class SqliteRepository implements Repository {
   }
 
   isEmailTaken(email: string, exceptStudentId?: string): boolean {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.isEmailTaken(email, exceptStudentId);
     let query = "SELECT id FROM students WHERE lower(email) = lower(?)";
     const params: string[] = [email];
     if (exceptStudentId) {
@@ -235,6 +270,7 @@ export class SqliteRepository implements Repository {
   }
 
   listActivities(studentId: string): Activity[] {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.listActivities(studentId);
     const rows = this.db.prepare(
       "SELECT data FROM activities WHERE student_id = ? ORDER BY created_at DESC LIMIT 50"
     ).all(studentId) as Array<{ data: string }>;
@@ -242,6 +278,7 @@ export class SqliteRepository implements Repository {
   }
 
   addActivity(studentId: string, activity: Activity): Activity {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.addActivity(studentId, activity);
     this.db.prepare(
       "INSERT INTO activities (id, student_id, data, created_at) VALUES (?, ?, ?, ?)"
     ).run(activity.id, studentId, JSON.stringify(activity), Date.now());
@@ -249,6 +286,7 @@ export class SqliteRepository implements Repository {
   }
 
   deleteActivity(studentId: string, id: string): boolean {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.deleteActivity(studentId, id);
     const result = this.db.prepare(
       "DELETE FROM activities WHERE student_id = ? AND id = ?"
     ).run(studentId, id);
@@ -256,6 +294,7 @@ export class SqliteRepository implements Repository {
   }
 
   listNotifications(studentId: string): Notification[] {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.listNotifications(studentId);
     const rows = this.db.prepare(
       "SELECT id, title, message, time, read FROM notifications WHERE student_id = ? ORDER BY created_at DESC"
     ).all(studentId) as Array<{ id: string; title: string; message: string; time: string; read: number }>;
@@ -270,6 +309,7 @@ export class SqliteRepository implements Repository {
   }
 
   markNotificationsRead(studentId: string): Notification[] {
+    if (this.memoryFallback || !this.db) return this.memoryFallback!.markNotificationsRead(studentId);
     this.db.prepare(
       "UPDATE notifications SET read = 1 WHERE student_id = ?"
     ).run(studentId);
@@ -277,7 +317,6 @@ export class SqliteRepository implements Repository {
   }
 
   close(): void {
-    this.db.close();
+    this.db?.close();
   }
 }
-

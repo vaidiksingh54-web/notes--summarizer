@@ -7,7 +7,7 @@
     "dev": "tsx server.ts",
     "dev:api": "tsx watch backend/src/index.ts",
     "dev:web": "vite --port=3000 --host=0.0.0.0",
-    "start": "node --import tsx server.ts",
+    "start": "node server.ts",
     "build": "vite build && node scripts/copy-assets.mjs",
     "preview": "vite preview",
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",

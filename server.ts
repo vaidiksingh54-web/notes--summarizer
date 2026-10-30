@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import fs from "node:fs";
 import path from "node:path";
 import { createApp } from "./backend/src/app.ts";
 
@@ -13,15 +14,32 @@ async function startServer() {
   if (!isProduction) {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        allowedHosts: true,
+        hmr: process.env.DISABLE_HMR !== "true",
+      },
       appType: "mpa",
     });
     app.use(vite.middlewares);
   } else {
     const distPath = path.resolve(process.cwd(), "dist");
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, { extensions: ["html"] }));
     app.get("*", (req, res, next) => {
       if (req.path.startsWith("/api")) return next();
+      const cleanPath = req.path.replace(/^\/+|\/+$/g, "");
+      if (cleanPath) {
+        const candidateHtml = path.join(distPath, `${cleanPath}.html`);
+        if (fs.existsSync(candidateHtml)) {
+          res.sendFile(candidateHtml);
+          return;
+        }
+      }
+      const notFoundHtml = path.join(distPath, "404.html");
+      if (cleanPath && fs.existsSync(notFoundHtml)) {
+        res.status(404).sendFile(notFoundHtml);
+        return;
+      }
       res.sendFile("index.html", { root: distPath });
     });
   }

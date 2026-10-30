@@ -1,6 +1,6 @@
 import type { Express, RequestHandler } from "express";
-import type { StudyAi } from "../types.js";
-import { parseChatRequest, parseFlashcardRequest, parseMindMapRequest, parseQuizRequest, parseSummaryRequest, parseTransformRequest } from "../validation.js";
+import type { StudyAi } from "../types.ts";
+import { parseChatRequest, parseFlashcardRequest, parseMindMapRequest, parseQuizRequest, parseSummaryRequest, parseTransformRequest } from "../validation.ts";
 
 export function registerAiRoutes(app: Express, ai: StudyAi, requireAuth: RequestHandler, optionalAuth?: RequestHandler): void {
   const chatAuth = optionalAuth || ((_req: any, _res: any, next: any) => next());

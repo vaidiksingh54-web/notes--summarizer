@@ -1,8 +1,8 @@
 import type { Express, RequestHandler } from "express";
-import { ApiError } from "../types.js";
-import type { Repository } from "../repository/repository.js";
-import { studentIdOf } from "../services/auth.js";
-import { parseActivity, parseProfile } from "../validation.js";
+import { ApiError } from "../types.ts";
+import type { Repository } from "../repository/repository.ts";
+import { studentIdOf } from "../services/auth.ts";
+import { parseActivity, parseProfile } from "../validation.ts";
 
 export function registerProfileRoutes(app: Express, repository: Repository, requireAuth: RequestHandler): void {
   app.get("/api/profile", requireAuth, async (request, response, next) => {

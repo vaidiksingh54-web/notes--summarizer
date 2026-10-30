@@ -953,7 +953,7 @@ async function extractTextFromPdf(file) {
   if (typeof window.pdfjsLib === "undefined") {
     throw new Error("PDF processing library not loaded. Please refresh the page.");
   }
-  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/js/vendor/pdf.worker.min.js";
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("js/vendor/pdf.worker.min.js", window.location.href).href;
   const arrayBuffer = await file.arrayBuffer();
   const loadingTask = window.pdfjsLib.getDocument({ data: arrayBuffer });
   const pdf = await loadingTask.promise;

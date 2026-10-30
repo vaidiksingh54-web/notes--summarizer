@@ -1,8 +1,8 @@
 import type { Express, RequestHandler } from "express";
-import { ApiError } from "../types.js";
-import type { Repository } from "../repository/repository.js";
-import { studentIdOf } from "../services/auth.js";
-import { parseItemChanges, parseStudyItem } from "../validation.js";
+import { ApiError } from "../types.ts";
+import type { Repository } from "../repository/repository.ts";
+import { studentIdOf } from "../services/auth.ts";
+import { parseItemChanges, parseStudyItem } from "../validation.ts";
 
 export function registerItemRoutes(app: Express, repository: Repository, requireAuth: RequestHandler): void {
   app.get("/api/items", requireAuth, async (request, response, next) => {

@@ -517,31 +517,11 @@
         demoGenBtn.innerHTML = `<span>⏳</span> Summarizing with AI...`;
 
         try {
-          let summaryText = "";
-          const token = window.store?.getToken();
-          if (token) {
-            try {
-              const data = await window.store.request("/api/summarize", {
-                method: "POST",
-                body: JSON.stringify({
-                  text: val,
-                  length: "short",
-                  style: "bulleted",
-                  difficulty: "intermediate"
-                })
-              });
-              summaryText = data?.summary || "";
-            } catch (apiErr) {
-              console.warn("Backend live summary failed, synthesizing preview:", apiErr);
-            }
-          }
-
-          if (!summaryText) {
-            summaryText = window.store?.synthesizeClientTransform(val, "key-takeaways") ||
-              `• Core Concepts: ${val.slice(0, 180)}...
-• Key Invariant: Essential fundamentals must be retained across all problem sets.
-• Study Action: Break definitions into flashcards and practice active recall.`;
-          }
+          const summaryText = await window.store.summarizeNotes(val, {
+            length: "short",
+            style: "bulleted",
+            difficulty: "intermediate"
+          });
 
           demoEmpty.style.display = "none";
           demoResult.style.display = "block";

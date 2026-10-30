@@ -1,6 +1,6 @@
 /**
- * CogniStudy AI - Production Configuration
+ * CogniStudy AI - Runtime API Configuration
+ * Empty string uses the integrated same-origin Express API server (/api/*).
+ * Set window.COGNISTUDY_API_URL only if hosting static HTML separately from the backend.
  */
-
-// Active Render backend URL for API requests and database synchronization
-window.COGNISTUDY_API_URL = window.COGNISTUDY_API_URL || "https://notes-summarizer-tpa1.onrender.com";
+window.COGNISTUDY_API_URL = window.COGNISTUDY_API_URL || "";

@@ -7,9 +7,9 @@ import type {
   PublicStudent,
   StoredStudent,
   StudyItem,
-} from "../types.js";
-import type { Repository } from "./repository.js";
-import { SqliteRepository } from "./sqliteRepository.js";
+} from "../types.ts";
+import type { Repository } from "./repository.ts";
+import { SqliteRepository } from "./sqliteRepository.ts";
 
 const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
 

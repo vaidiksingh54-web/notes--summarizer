@@ -206,12 +206,16 @@ window.shareLibraryItem = function(id) {
   const item = window.store.getItemById(id);
   if (!item) return;
   const title = item.title;
-  const destination = item.type === "flashcards" ? "flashcards.html" : item.type === "quiz" ? "quiz.html" : "notes.html";
+  const destination = item.type === "flashcards"
+    ? "flashcards.html"
+    : item.type === "quiz"
+      ? "quiz.html"
+      : item.type === "mindmap"
+        ? "mindmap.html"
+        : "notes.html";
   const url = `${window.location.origin}/${destination}?id=${encodeURIComponent(id)}`;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(() => {
-      window.showToast(`Share link for "${title}" copied to clipboard!`, "success");
-    });
+  if (typeof window.copyToClipboard === "function") {
+    window.copyToClipboard(url, `Share link for "${title}" copied to clipboard!`);
   } else {
     window.showToast(`Share link: ${url}`, "info");
   }

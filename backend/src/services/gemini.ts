@@ -1,6 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
-import { ApiError, type ChatRequest, type FlashcardRequest, type MindMapNode, type MindMapRequest, type QuizQuestion, type QuizRequest, type StudyAi, type SummaryOptions } from "../types.js";
-import { parseGeneratedCards, parseGeneratedMindMap, parseGeneratedQuiz } from "../validation.js";
+import {
+  ApiError,
+  type ChatRequest,
+  type FlashcardRequest,
+  type MindMapNode,
+  type MindMapRequest,
+  type QuizQuestion,
+  type QuizRequest,
+  type StudyAi,
+  type SummaryOptions,
+} from "../types.ts";
+import { parseGeneratedCards, parseGeneratedMindMap, parseGeneratedQuiz } from "../validation.ts";
 
 type GeminiClient = Pick<GoogleGenAI, "models">;
 type GeminiClientFactory = (apiKey: string) => GeminiClient;
@@ -23,9 +33,12 @@ function parseModelJson(text: string): unknown {
 }
 
 export class GeminiStudyAi implements StudyAi {
+  private readonly apiKey: string | undefined;
+  private readonly createClient: GeminiClientFactory;
+
   constructor(
-    private readonly apiKey = process.env.GEMINI_API_KEY,
-    private readonly createClient: GeminiClientFactory = (key) =>
+    apiKey = process.env.GEMINI_API_KEY,
+    createClient: GeminiClientFactory = (key) =>
       new GoogleGenAI({
         apiKey: key,
         httpOptions: {
@@ -34,37 +47,46 @@ export class GeminiStudyAi implements StudyAi {
           },
         },
       }),
-  ) {}
+  ) {
+    this.apiKey = apiKey;
+    this.createClient = createClient;
+  }
 
   private requireKey(): string {
-    const key = this.apiKey?.trim();
+    const key = (this.apiKey ?? process.env.GEMINI_API_KEY)?.trim();
     if (!key || key === "YOUR_GEMINI_API_KEY" || key === "MY_GEMINI_API_KEY") {
       throw new ApiError(503, "GEMINI_NOT_CONFIGURED", "AI features are unavailable until GEMINI_API_KEY is configured on the server.");
     }
     return key;
   }
 
-  private async generateText(prompt: string, responseMimeType?: string): Promise<string> {
+  private async generateText(
+    prompt: string,
+    options?: { responseMimeType?: string; systemInstruction?: string },
+  ): Promise<string> {
     const key = this.requireKey();
     const client = this.createClient(key);
     const candidateModels = [
       process.env.GEMINI_MODEL,
-      "gemini-2.5-flash-lite",
-      "gemini-flash-latest",
       "gemini-3.8-flash",
-      "gemini-3.5-flash",
-      "gemini-3.5-flash-lite",
-      "gemini-2.5-flash",
-      "gemini-2.0-flash",
+      "gemini-flash-latest",
+      "gemini-3.1-flash-lite",
     ].filter(Boolean) as string[];
     let lastError: unknown;
 
     for (const model of candidateModels) {
       try {
+        const config: Record<string, unknown> = {};
+        if (options?.responseMimeType) {
+          config.responseMimeType = options.responseMimeType;
+        }
+        if (options?.systemInstruction) {
+          config.systemInstruction = options.systemInstruction;
+        }
         const response = await client.models.generateContent({
           model,
           contents: prompt,
-          ...(responseMimeType ? { config: { responseMimeType } } : {}),
+          ...(Object.keys(config).length > 0 ? { config } : {}),
         });
         const text = response.text?.trim();
         if (text) {
@@ -103,18 +125,13 @@ export class GeminiStudyAi implements StudyAi {
         ? "Audience: Advanced undergraduate or research examination level using precise academic terminology."
         : "Audience: College undergraduate study level.";
 
-    const prompt = `You are CogniStudy AI Tutor, an expert academic study assistant.
-Create an accurate, structured study summary of the following notes.
+    const systemInstruction = `You are CogniStudy AI Tutor, an expert academic study assistant.
 ${lengthDirective}
 ${styleDirective}
 ${difficultyDirective}
+Return clean, readable text with markdown formatting (headings, bullet points, bold highlights) for optimal study clarity.`;
 
-Return clean, readable text with markdown formatting (headings, bullet points, bold highlights) for optimal study clarity.
-
-[SOURCE STUDY MATERIAL]:
-${text}`;
-
-    return this.generateText(prompt);
+    return this.generateText(`Summarize the following study material:\n\n${text}`, { systemInstruction });
   }
 
   async generateFlashcards(request: FlashcardRequest): Promise<Array<{ question: string; answer: string }>> {
@@ -125,7 +142,7 @@ ${text}`;
       `Create exactly ${request.count} ${request.difficulty} study flashcards about "${request.topic}". ${source}
 Return JSON only in this shape: {"cards":[{"question":"...","answer":"..."}]}
 Do not wrap the JSON in markdown code blocks.`,
-      "application/json",
+      { responseMimeType: "application/json" },
     );
     const payload = parseModelJson(text);
     const cards = payload && typeof payload === "object" && "cards" in payload
@@ -145,17 +162,16 @@ Do not wrap the JSON in markdown code blocks.`,
           .join("\n") + "\n"
       : "";
 
-    const prompt = `You are CogniStudy AI Tutor, an expert academic tutor and study assistant.
-Your mission is to help students learn effectively by:
+    const systemInstruction = `You are CogniStudy AI Tutor, an expert academic tutor and study assistant.
+Help students learn effectively by:
 1. Summarizing lengthy lectures, notes, and academic texts into crisp, structured takeaways.
 2. Explaining difficult concepts using intuition, analogies, and clear formatting (bullet points, bold highlights).
 3. Formulating active recall questions, definitions, and high-yield revision tips upon request.
-Keep answers concise, direct, academically accurate, and easy to review.${contextPart}
+Keep answers concise, direct, academically accurate, and easy to review.${contextPart}`;
 
-${historyPrompt}Student: ${request.message}
-CogniStudy AI Tutor:`;
+    const prompt = `${historyPrompt}Student: ${request.message}\nCogniStudy AI Tutor:`;
 
-    return this.generateText(prompt);
+    return this.generateText(prompt, { systemInstruction });
   }
 
   async generateQuiz(request: QuizRequest): Promise<QuizQuestion[]> {
@@ -167,7 +183,7 @@ CogniStudy AI Tutor:`;
 Each question must have exactly 4 choices in "options", "correct" index (0, 1, 2, or 3), and an "explanation".
 Return JSON only in this shape: {"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"..."}]}
 Do not wrap the JSON in markdown code blocks.`,
-      "application/json",
+      { responseMimeType: "application/json" },
     );
     const payload = parseModelJson(text);
     const questions = payload && typeof payload === "object" && "questions" in payload
@@ -182,12 +198,14 @@ Do not wrap the JSON in markdown code blocks.`,
       directive = "Condense this text into an ultra-concise study overview focusing strictly on core definitions and bottom-line takeaways.";
     } else if (action === "expand") {
       directive = "Deepen this text by elaborating on underlying mechanisms, practical context, and academic details.";
-    } else if (action === "simplify") {
+    } else if (action === "simplify" || action === "eli5") {
       directive = "Explain this text using simple language, clear analogies, and intuitive breakdown (ELI5 style).";
-    } else if (action === "bullets") {
+    } else if (action === "bullets" || action === "bullet-points") {
       directive = "Format this material into clean, high-yield bullet points with bold highlights for key terms.";
     } else if (action === "rephrase") {
       directive = "Rephrase this content in polished, rigorous academic language suitable for exam revision.";
+    } else if (action === "key-takeaways") {
+      directive = "Extract the most critical exam takeaways, definitions, and key points in concise bullet points.";
     }
 
     return this.generateText(`${directive}\n\n[SOURCE NOTES]:\n${text}`);
@@ -229,10 +247,9 @@ Requirements:
   ]
 }
 Do not wrap in markdown backticks or explanations. Return JSON only.`,
-      "application/json",
+      { responseMimeType: "application/json" },
     );
     const payload = parseModelJson(text);
     return parseGeneratedMindMap(payload);
   }
 }
-

@@ -69,7 +69,7 @@ function initNotesGenerator() {
   }
 
 if (window.pdfjsLib) {
-  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/js/vendor/pdf.worker.min.js";
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("js/vendor/pdf.worker.min.js", window.location.href).href;
 }
 
 function renderMarkdownToHtml(markdown) {
@@ -232,40 +232,32 @@ async function extractTextFromPdf(file) {
 
       generateBtn.disabled = true;
       try {
-        const data = await window.store.request("/api/summarize", {
-          method: "POST",
-          body: JSON.stringify({
-            text: content,
-            length: lengthVal,
-            difficulty: difficultyVal,
-            style: styleVal
-          })
+        const summary = await window.store.summarizeNotes(content, {
+          length: lengthVal,
+          difficulty: difficultyVal,
+          style: styleVal
         });
 
         clearInterval(stepInterval);
         if (loadingState) loadingState.style.display = "none";
         if (outputCard) {
-          outputCard.style.display = "block";
+          outputCard.style.display = "flex";
           const titleEl = document.getElementById("generated-notes-title");
           const editorEl = document.getElementById("notes-editor-content");
-          if (titleEl) titleEl.textContent = "AI Summary";
+          const headingMatch = summary.match(/^#{1,3}\s+(.+)$/m);
+          const derivedTitle = headingMatch
+            ? headingMatch[1].replace(/[*_`]/g, "").trim().slice(0, 70)
+            : "AI Study Summary";
+          if (titleEl) titleEl.textContent = derivedTitle || "AI Study Summary";
           if (editorEl) {
-            editorEl.innerHTML = renderMarkdownToHtml(data.summary);
+            editorEl.innerHTML = renderMarkdownToHtml(summary);
           }
         }
-        window.showToast("Summary generated.", "success");
+        window.showToast("Summary generated!", "success");
       } catch (error) {
         clearInterval(stepInterval);
         if (loadingState) loadingState.style.display = "none";
-        if (outputCard) outputCard.style.display = "block";
-
-        const titleEl = document.getElementById("generated-notes-title");
-        const editorEl = document.getElementById("notes-editor-content");
-        if (titleEl) titleEl.textContent = "Error";
-        if (editorEl) {
-          editorEl.textContent = error.message || "Unable to generate the summary.";
-        }
-
+        if (emptyState) emptyState.style.display = "flex";
         window.showToast(error.message || "Unable to generate the summary.", "error");
       } finally {
         generateBtn.disabled = false;
@@ -369,15 +361,7 @@ function initNotesEditor() {
         window.showToast("No summary content to copy.", "error");
         return;
       }
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(textContent).then(() => {
-          window.showToast("Summary copied to clipboard!", "success");
-        }).catch(() => {
-          window.showToast("Failed to copy summary.", "error");
-        });
-      } else {
-        window.showToast("Clipboard not supported in this browser.", "error");
-      }
+      window.copyToClipboard(textContent, "Summary copied to clipboard!");
     });
   }
 
@@ -487,7 +471,7 @@ function checkUrlParamsForEdit() {
       const titleEl = document.getElementById("generated-notes-title");
       const editorEl = document.getElementById("notes-editor-content");
       if (emptyState) emptyState.style.display = "none";
-      if (outputCard) outputCard.style.display = "block";
+      if (outputCard) outputCard.style.display = "flex";
       if (titleEl) titleEl.textContent = item.title;
       if (editorEl) editorEl.innerHTML = item.content;
       window.showToast(`Loaded "${item.title}" for editing`, "info");

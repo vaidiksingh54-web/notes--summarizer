@@ -25,22 +25,11 @@ function initQuickDemoAccess() {
     window.showToast("Launching instant Student Workspace demo...", "info");
 
     try {
-      const demoAuth = await window.store.request("/api/auth/google", {
-        method: "POST",
-        body: JSON.stringify({
-          email: "evaluator.student@college.edu",
-          name: "Guest Student",
-          uid: "demo-evaluator-id-2026"
-        })
-      });
-
-      if (demoAuth && demoAuth.token) {
-        window.store.setSession(demoAuth.token, demoAuth.profile);
-        window.showToast(`Signed in as ${demoAuth.profile.name}! Redirecting to dashboard...`, "success");
-        setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 300);
-      }
+      const profile = await window.store.demoLogin();
+      window.showToast(`Signed in as ${profile.name}! Redirecting to dashboard...`, "success");
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 300);
     } catch (err) {
       window.showToast(err.message || "Demo login unavailable.", "error");
       demoBtn.disabled = false;

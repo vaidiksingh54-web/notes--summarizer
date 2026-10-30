@@ -5,7 +5,7 @@ import type {
   PublicStudent,
   StoredStudent,
   StudyItem,
-} from "../types.js";
+} from "../types.ts";
 
 export interface Repository {
   createStudent(email: string, passwordHash: string, profile: Profile): PublicStudent | Promise<PublicStudent>;
