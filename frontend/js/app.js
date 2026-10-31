@@ -363,7 +363,7 @@ function initAiAssistantWidget() {
             <div style="font-weight: 700; color: #fff; font-size: 0.95rem;" id="ai-panel-title">CogniStudy AI Tutor</div>
             <div style="font-size: 0.72rem; color: #34d399; display: flex; align-items: center; gap: 4px;">
               <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#34d399;"></span>
-              Powered by Gemini 3.8 Flash
+              Powered by Gemini AI
             </div>
           </div>
         </div>
@@ -550,8 +550,9 @@ function initAiAssistantWidget() {
     input.style.height = "auto";
     appendUserMessage(text);
 
+    const isCasualGreeting = /^(hi+|hello+|hey+|hlo+|yo|namaste|good\s*(morning|afternoon|evening|night)|how\s+are\s+you|kaise\s+ho|what'?s\s+up|thanks|thank\s+you)[!?. ]*$/i.test(text);
     let context = "";
-    if (attachContextCheck.checked) {
+    if (attachContextCheck.checked && !isCasualGreeting) {
       context = getAvailableNotesText();
     }
 

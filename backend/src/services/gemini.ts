@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import {
   ApiError,
   type ChatRequest,
@@ -14,6 +14,7 @@ import { parseGeneratedCards, parseGeneratedMindMap, parseGeneratedQuiz } from "
 
 type GeminiClient = Pick<GoogleGenAI, "models">;
 type GeminiClientFactory = (apiKey: string) => GeminiClient;
+type ContentTurn = { role: "user" | "model"; parts: Array<{ text: string }> };
 
 function parseModelJson(text: string): unknown {
   const trimmed = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
@@ -61,32 +62,38 @@ export class GeminiStudyAi implements StudyAi {
   }
 
   private async generateText(
-    prompt: string,
+    contents: string | ContentTurn[],
     options?: { responseMimeType?: string; systemInstruction?: string },
   ): Promise<string> {
     const key = this.requireKey();
     const client = this.createClient(key);
     const candidateModels = [
       process.env.GEMINI_MODEL,
-      "gemini-3.8-flash",
-      "gemini-flash-latest",
       "gemini-3.1-flash-lite",
+      "gemini-3.8-flash",
     ].filter(Boolean) as string[];
     let lastError: unknown;
 
     for (const model of candidateModels) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(new Error(`Model ${model} timed out`)), 15_000);
       try {
-        const config: Record<string, unknown> = {};
+        const config: Record<string, unknown> = {
+          abortSignal: controller.signal,
+        };
         if (options?.responseMimeType) {
           config.responseMimeType = options.responseMimeType;
         }
         if (options?.systemInstruction) {
           config.systemInstruction = options.systemInstruction;
         }
+        if (model === "gemini-3.8-flash") {
+          config.thinkingConfig = { thinkingLevel: ThinkingLevel.LOW };
+        }
         const response = await client.models.generateContent({
           model,
-          contents: prompt,
-          ...(Object.keys(config).length > 0 ? { config } : {}),
+          contents,
+          config,
         });
         const text = response.text?.trim();
         if (text) {
@@ -95,6 +102,8 @@ export class GeminiStudyAi implements StudyAi {
       } catch (error) {
         lastError = error;
         console.warn(`Gemini generation with ${model} failed, checking fallback:`, error);
+      } finally {
+        clearTimeout(timer);
       }
     }
 
@@ -153,25 +162,43 @@ Do not wrap the JSON in markdown code blocks.`,
 
   async chat(request: ChatRequest): Promise<string> {
     const contextPart = request.context?.trim()
-      ? `\n\n[REFERENCE STUDY MATERIAL / NOTES]:\n${request.context.trim()}\n\nUse the above reference material to accurately answer, summarize, or extract key concepts when relevant.`
+      ? `\n\n[OPTIONAL PAGE STUDY CONTEXT]:\n${request.context.trim()}\n(Only reference this page context when the user's message asks about their current notes/topic, such as "summarize this", "explain these notes", or "quiz me on this". Ignore it completely for greetings or unrelated questions.)`
       : "";
 
-    const historyPrompt = request.history?.length
-      ? request.history
-          .map((m) => `${m.role === "user" ? "Student" : "CogniStudy AI Tutor"}: ${m.content}`)
-          .join("\n") + "\n"
-      : "";
+    const systemInstruction = `You are CogniStudy AI, a friendly, smart, and conversational AI assistant and study tutor.
+Follow these rules strictly:
+1. Natural Greetings & Small Talk: When the user greets you (e.g., "hi", "hii", "hello", "hey", "how are you", "kaise ho") or chats casually, reply warmly and naturally in 1–2 short sentences like a helpful assistant (for example: "Hi! How can I help you today?"). Never output a study template on a greeting.
+2. Specific, Unique Answers: Answer whatever exact question the user asks—whether science, math, programming, history, exam prep, definitions, or general knowledge—clearly, accurately, and directly tailored to their message.
+3. Language Match: Respond naturally in the same language/style the user writes in (English, Hindi, or Hinglish).${contextPart}`;
 
-    const systemInstruction = `You are CogniStudy AI Tutor, an expert academic tutor and study assistant.
-Help students learn effectively by:
-1. Summarizing lengthy lectures, notes, and academic texts into crisp, structured takeaways.
-2. Explaining difficult concepts using intuition, analogies, and clear formatting (bullet points, bold highlights).
-3. Formulating active recall questions, definitions, and high-yield revision tips upon request.
-Keep answers concise, direct, academically accurate, and easy to review.${contextPart}`;
+    const turns: ContentTurn[] = [];
+    if (request.history?.length) {
+      for (const msg of request.history) {
+        const role: "user" | "model" = msg.role === "user" ? "user" : "model";
+        const content = msg.content.trim();
+        if (!content) continue;
+        const prev = turns[turns.length - 1];
+        if (prev && prev.role === role) {
+          prev.parts[0].text += `\n${content}`;
+        } else {
+          turns.push({ role, parts: [{ text: content }] });
+        }
+      }
+    }
 
-    const prompt = `${historyPrompt}Student: ${request.message}\nCogniStudy AI Tutor:`;
+    const latestText = request.message.trim();
+    const lastTurn = turns[turns.length - 1];
+    if (lastTurn && lastTurn.role === "user") {
+      lastTurn.parts[0].text += `\n${latestText}`;
+    } else {
+      turns.push({ role: "user", parts: [{ text: latestText }] });
+    }
 
-    return this.generateText(prompt, { systemInstruction });
+    if (turns[0]?.role === "model") {
+      turns.shift();
+    }
+
+    return this.generateText(turns, { systemInstruction });
   }
 
   async generateQuiz(request: QuizRequest): Promise<QuizQuestion[]> {

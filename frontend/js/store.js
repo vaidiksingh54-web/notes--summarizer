@@ -212,20 +212,31 @@ class StudyStore {
     const token = this.getToken();
     const base = getApiBaseUrl();
     const url = path.startsWith("http") ? path : `${base}${path}`;
+    const headers = {
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(token && !this.isLocalToken(token) ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers
+    };
+
     let response;
     try {
-      response = await fetch(url, {
-        ...options,
-        headers: {
-          ...(options.body ? { "Content-Type": "application/json" } : {}),
-          ...(token && !this.isLocalToken(token) ? { Authorization: `Bearer ${token}` } : {}),
-          ...options.headers
-        }
-      });
+      response = await fetch(url, { ...options, headers });
     } catch (networkErr) {
-      const err = new Error(`Backend API unreachable (${networkErr.message || "network error"}).`);
-      err.isBackendOffline = true;
-      throw err;
+      // If a stale custom cogni_api_url in localStorage failed, retry against integrated same-origin /api/*
+      if (base && !path.startsWith("http") && safeGet("cogni_api_url")) {
+        try {
+          const sameOriginRes = await fetch(path, { ...options, headers });
+          if (sameOriginRes.ok || (sameOriginRes.headers.get("content-type") || "").includes("application/json")) {
+            safeRemove("cogni_api_url");
+            response = sameOriginRes;
+          }
+        } catch (_retryErr) {}
+      }
+      if (!response) {
+        const err = new Error(`Backend API unreachable (${networkErr.message || "network error"}).`);
+        err.isBackendOffline = true;
+        throw err;
+      }
     }
 
     if (response.status === 204) return null;
@@ -786,27 +797,42 @@ class StudyStore {
           }))
       : [];
 
-    try {
-      const result = await this.request("/api/ai/chat", {
-        method: "POST",
-        body: JSON.stringify({
-          message: String(message || "").trim(),
-          context: context ? String(context).slice(0, 35000) : undefined,
-          history: cleanHistory.length ? cleanHistory : undefined
-        })
-      });
-      if (result && result.reply) return result.reply;
-    } catch (err) {
-      console.warn("AI assistant request warning:", err);
-      const errorMsg = String(err.message || "");
-      if (err.code === "GEMINI_NOT_CONFIGURED" || errorMsg.includes("GEMINI_NOT_CONFIGURED") || errorMsg.includes("GEMINI_API_KEY")) {
-        return "⚠️ **AI Configuration Needed:**\n\nPlease verify that `GEMINI_API_KEY` is configured in the **Settings > Secrets** panel (or server environment variables) to enable live Gemini responses.";
-      }
-      if (!err.isBackendOffline && err.status && err.status < 500) {
-        throw err;
+    const payload = JSON.stringify({
+      message: String(message || "").trim(),
+      context: context ? String(context).slice(0, 35000) : undefined,
+      history: cleanHistory.length ? cleanHistory : undefined
+    });
+
+    let lastError = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const result = await this.request("/api/ai/chat", {
+          method: "POST",
+          body: payload
+        });
+        if (result && typeof result.reply === "string" && result.reply.trim()) {
+          return result.reply.trim();
+        }
+      } catch (err) {
+        lastError = err;
+        if (err.code === "GEMINI_NOT_CONFIGURED") {
+          throw err;
+        }
+        if (err.status && err.status >= 400 && err.status < 500 && !err.isBackendOffline) {
+          throw err;
+        }
+        if (attempt === 0 && !err.isBackendOffline) {
+          await new Promise((r) => setTimeout(r, 400));
+          continue;
+        }
+        break;
       }
     }
-    return this.synthesizeTutorResponse(message, context);
+
+    if (lastError && lastError.isBackendOffline) {
+      throw new Error("Could not connect to the backend AI server (/api/ai/chat). Make sure the full-stack server (`npm run dev` on port 3000 or AI Studio Deploy) is running rather than static-only hosting.");
+    }
+    throw lastError || new Error("Unable to receive a response from the AI assistant. Please try again.");
   }
 
   synthesizeTutorResponse(message, context = "") {
