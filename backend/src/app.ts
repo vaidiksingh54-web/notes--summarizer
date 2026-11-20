@@ -20,9 +20,13 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
   } else if (process.env.STORAGE_TYPE === "in-memory") {
     repository = new InMemoryRepository();
   } else if (
-    (process.env.STORAGE_TYPE === "supabase" || (!process.env.STORAGE_TYPE && process.env.SUPABASE_URL)) &&
-    process.env.SUPABASE_URL &&
-    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY)
+    process.env.STORAGE_TYPE === "supabase" ||
+    (!process.env.STORAGE_TYPE &&
+      process.env.SUPABASE_URL &&
+      (process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.SUPABASE_KEY ||
+        process.env.SUPABASE_SECRET_KEY ||
+        process.env.SUPABASE_ANON_KEY))
   ) {
     try {
       repository = new SupabaseRepository();
@@ -87,14 +91,22 @@ export function createApp(options: { repository?: Repository; ai?: StudyAi } = {
   );
 
 
-  app.get("/api/health", (_request, response) => {
+  app.get("/api/health", async (_request, response) => {
     const key = process.env.GEMINI_API_KEY?.trim();
     let storageType = "sqlite-persistent";
-    if (repository instanceof InMemoryRepository) storageType = "in-memory-per-student";
-    else if (repository instanceof SupabaseRepository) storageType = "supabase-persistent";
+    let supabase: ReturnType<SupabaseRepository["getStatus"]> | undefined;
+
+    if (repository instanceof InMemoryRepository) {
+      storageType = "in-memory-per-student";
+    } else if (repository instanceof SupabaseRepository) {
+      supabase = await repository.verifyConnection();
+      storageType = supabase.connected ? "supabase-persistent" : "sqlite-fallback";
+    }
+
     response.json({
       status: "ok",
       storage: storageType,
+      ...(supabase ? { supabase } : {}),
       auth: "student-accounts",
       geminiConfigured: Boolean(key && key !== "YOUR_GEMINI_API_KEY" && key !== "MY_GEMINI_API_KEY"),
     });

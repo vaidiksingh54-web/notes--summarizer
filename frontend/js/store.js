@@ -176,22 +176,106 @@ class StudyStore {
     return typeof token === "string" && token.startsWith("local_session_");
   }
 
-  async loadFromApi() {
+  stripClientMeta(item) {
+    const copy = { ...item };
+    delete copy._synced;
+    return copy;
+  }
+
+  async ensureBackendSession() {
+    const existing = this.getToken();
+    if (existing && !this.isLocalToken(existing)) {
+      return existing;
+    }
+
+    let guestUid = safeGet("cogni_guest_uid");
+    if (!guestUid) {
+      guestUid = `workspace-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      safeSet("cogni_guest_uid", guestUid);
+    }
+
+    const email = (this.user && this.user.email && this.user.email.includes("@"))
+      ? this.user.email.trim().toLowerCase()
+      : `${guestUid}@workspace.cognistudy.edu`;
+    const name = (this.user && this.user.name && this.user.name !== "Student")
+      ? this.user.name.trim()
+      : "Workspace Student";
+
+    try {
+      const auth = await this.request("/api/auth/google", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          name,
+          uid: guestUid
+        })
+      });
+      if (auth && auth.token) {
+        this.setSession(auth.token, auth.profile);
+        return auth.token;
+      }
+    } catch (_err) {
+      // Backend is unreachable or email belongs to a password account; keep existing state
+    }
+    return null;
+  }
+
+  async syncPendingLocalItems(serverIds = new Set()) {
     const token = this.getToken();
+    if (!token || this.isLocalToken(token)) return;
+
+    const unsynced = this.items.filter((i) => i && i.id && (!i._synced || !serverIds.has(i.id)));
+    for (const localItem of unsynced) {
+      try {
+        const cleanPayload = this.stripClientMeta({
+          ...localItem,
+          date: localItem.date || new Date().toLocaleDateString(),
+          isFavorite: Boolean(localItem.isFavorite)
+        });
+        const result = await this.request("/api/items", {
+          method: "POST",
+          body: JSON.stringify(cleanPayload)
+        });
+        if (result && result.item) {
+          this.items = this.items.map((existing) =>
+            existing.id === localItem.id ? { ...result.item, _synced: true } : existing
+          );
+        }
+      } catch (err) {
+        if (err && err.status === 409) {
+          this.items = this.items.map((existing) =>
+            existing.id === localItem.id ? { ...existing, _synced: true } : existing
+          );
+        }
+      }
+    }
+  }
+
+  async loadFromApi() {
+    let token = this.getToken();
+    if (token && this.isLocalToken(token)) {
+      token = await this.ensureBackendSession();
+    }
     if (!token || this.isLocalToken(token)) return;
 
     try {
       const data = await this.request("/api/bootstrap");
       this.user = { ...EMPTY_USER, ...data.profile, isLoggedIn: true };
 
-      // Merge any unsynced locally created items with server items
-      const serverItems = Array.isArray(data.items) ? data.items : [];
+      const serverItems = (Array.isArray(data.items) ? data.items : []).map((item) => ({
+        ...item,
+        _synced: true
+      }));
       const serverIds = new Set(serverItems.map((i) => i.id));
       const unsyncedLocal = this.items.filter((i) => i && i.id && !serverIds.has(i.id));
       this.items = [...serverItems, ...unsyncedLocal];
 
+      if (unsyncedLocal.length > 0) {
+        await this.syncPendingLocalItems(serverIds);
+      }
+
       if (Array.isArray(data.notifications)) this.notifications = data.notifications;
-      if (Array.isArray(data.activities) && data.activities.length > 0) {
+      if (Array.isArray(data.activities)) {
         this.activities = data.activities;
       }
       this.persistLocalCache();
@@ -407,16 +491,16 @@ class StudyStore {
 
   async saveItem(item) {
     const cleanId = String(item.id || `${item.type || "item"}-${Date.now()}`).replace(/[^A-Za-z0-9_-]/g, "-");
-    const prepared = {
+    const prepared = this.stripClientMeta({
       ...item,
       id: cleanId,
       date: item.date || new Date().toLocaleDateString(),
       isFavorite: Boolean(item.isFavorite)
-    };
+    });
     const existsOnServer = this.items.some((existing) => existing.id === cleanId && existing._synced);
     let saved = prepared;
 
-    const token = this.getToken();
+    const token = await this.ensureBackendSession();
     if (token && !this.isLocalToken(token)) {
       try {
         const result = await this.request(existsOnServer ? `/api/items/${encodeURIComponent(cleanId)}` : "/api/items", {
@@ -445,7 +529,7 @@ class StudyStore {
   }
 
   async deleteItem(id) {
-    const token = this.getToken();
+    const token = await this.ensureBackendSession();
     if (token && !this.isLocalToken(token)) {
       try {
         await this.request(`/api/items/${encodeURIComponent(id)}`, { method: "DELETE" });
@@ -461,7 +545,7 @@ class StudyStore {
     const item = this.getItemById(id);
     if (!item) throw new Error("Study item was not found.");
     const newStatus = !item.isFavorite;
-    const token = this.getToken();
+    const token = await this.ensureBackendSession();
     if (token && !this.isLocalToken(token)) {
       try {
         const result = await this.request(`/api/items/${encodeURIComponent(id)}/favorite`, {
@@ -506,7 +590,7 @@ class StudyStore {
   }
 
   async markNotificationsRead() {
-    const token = this.getToken();
+    const token = await this.ensureBackendSession();
     if (token && !this.isLocalToken(token)) {
       try {
         const result = await this.request("/api/notifications/read", { method: "PATCH" });
@@ -529,7 +613,7 @@ class StudyStore {
       id: activity.id || `act-${Date.now()}`,
       date: activity.date || new Date().toLocaleDateString()
     };
-    const token = this.getToken();
+    const token = await this.ensureBackendSession();
     if (token && !this.isLocalToken(token)) {
       try {
         const result = await this.request("/api/activities", {
@@ -546,7 +630,7 @@ class StudyStore {
   }
 
   async deleteActivity(id) {
-    const token = this.getToken();
+    const token = await this.ensureBackendSession();
     if (token && !this.isLocalToken(token)) {
       try {
         await this.request(`/api/activities/${encodeURIComponent(id)}`, { method: "DELETE" });
@@ -557,7 +641,7 @@ class StudyStore {
   }
 
   async saveProfile(profile) {
-    const token = this.getToken();
+    const token = await this.ensureBackendSession();
     if (token && !this.isLocalToken(token)) {
       try {
         const result = await this.request("/api/profile", {

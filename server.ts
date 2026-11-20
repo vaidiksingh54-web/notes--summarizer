@@ -11,6 +11,16 @@ const isProduction = process.env.NODE_ENV === "production";
 async function startServer() {
   const app = createApp();
 
+  app.get("/CogniStudy_AI_Presentation.pdf", (_req, res, next) => {
+    const pdfPath = path.resolve(process.cwd(), "CogniStudy_AI_Presentation.pdf");
+    if (fs.existsSync(pdfPath)) {
+      res.type("application/pdf");
+      res.sendFile(pdfPath);
+      return;
+    }
+    next();
+  });
+
   if (!isProduction) {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
@@ -44,9 +54,17 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, HOST, () => {
+  const server = app.listen(PORT, HOST, () => {
     console.log(`CogniStudy AI server listening at http://${HOST}:${PORT}`);
+  });
+
+  server.on("error", (err) => {
+    console.error(`Server failed to bind ${HOST}:${PORT}:`, err);
+    process.exit(1);
   });
 }
 
-startServer();
+startServer().catch((err) => {
+  console.error("Fatal error starting CogniStudy AI server:", err);
+  process.exit(1);
+});

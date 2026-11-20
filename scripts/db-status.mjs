@@ -1,3 +1,5 @@
+import "dotenv/config";
+import { createClient } from "@supabase/supabase-js";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
@@ -7,56 +9,85 @@ const dbPath = path.resolve(process.cwd(), "backend", "study_app.db");
 if (process.argv.includes("--reset")) {
   if (fs.existsSync(dbPath)) {
     fs.unlinkSync(dbPath);
-    console.log("Database reset! Starting the server (npm run dev) will regenerate fresh tables and standard demo data.");
+    console.log("Local SQLite cache reset.");
   } else {
-    console.log("No database file found to reset.");
+    console.log("No local SQLite file found to reset.");
   }
   process.exit(0);
 }
 
-if (!fs.existsSync(dbPath)) {
-  console.log("No database file found at: " + dbPath);
-  console.log("Start the server once (npm run dev) to automatically generate your database!");
-  process.exit(0);
+function isPlaceholder(val) {
+  if (!val || !val.trim()) return true;
+  return /your[-_]?project|your[-_]?supabase|example\.supabase\.co|placeholder|<project|YOUR_|MY_SUPABASE/i.test(val.trim());
 }
 
-const stats = fs.statSync(dbPath);
-const db = new DatabaseSync(dbPath);
+async function checkSupabase() {
+  const url = process.env.SUPABASE_URL?.trim();
+  const key = (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_KEY ||
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    ""
+  ).trim();
 
-console.log("\n==========================================");
-console.log("      COGNISTUDY AI DATABASE STATUS       ");
-console.log("==========================================");
-console.log(`Database File : ${dbPath}`);
-console.log(`File Size     : ${(stats.size / 1024).toFixed(2)} KB\n`);
+  console.log("\n==========================================");
+  console.log("      COGNISTUDY AI SUPABASE STATUS       ");
+  console.log("==========================================");
 
-try {
-  const students = db.prepare("SELECT id, email, profile FROM students").all();
-  console.log(`Students (${students.length}):`);
-  for (const s of students) {
-    const profile = JSON.parse(s.profile || "{}");
-    console.log(`  - [${s.id}] ${profile.name || "Student"} <${s.email}> (${profile.college || "General"})`);
+  if (!url || !key || isPlaceholder(url) || isPlaceholder(key)) {
+    console.log("Status        : NOT CONNECTED (Missing or placeholder credentials)");
+    console.log("Action Needed : Set real SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+    console.log("                and run supabase_setup.sql in Supabase SQL Editor.\n");
+    return false;
   }
 
-  const items = db.prepare("SELECT type, count(*) as count FROM study_items GROUP BY type").all();
-  console.log("\nSaved Study Items:");
-  if (items.length === 0) {
-    console.log("  (None yet)");
-  } else {
-    for (const item of items) {
-      console.log(`  - ${item.type.toUpperCase()}: ${item.count}`);
+  const client = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(6000) }),
+    },
+  });
+
+  const tables = ["students", "sessions", "study_items", "activities", "notifications"];
+  let allHealthy = true;
+
+  for (const table of tables) {
+    try {
+      const { count, error } = await client.from(table).select("*", { count: "exact", head: true });
+      if (error) {
+        allHealthy = false;
+        console.log(`Table [${table.padEnd(13)}] : ERROR -> ${error.message}`);
+      } else {
+        console.log(`Table [${table.padEnd(13)}] : OK (${count ?? 0} rows)`);
+      }
+    } catch (err) {
+      allHealthy = false;
+      console.log(`Table [${table.padEnd(13)}] : UNREACHABLE -> ${err.message}`);
     }
   }
 
-  const totalItems = db.prepare("SELECT count(*) as total FROM study_items").get();
-  console.log(`  Total Items: ${totalItems.total}`);
-
-  const sessions = db.prepare("SELECT count(*) as total FROM sessions").get();
-  console.log(`\nActive Login Sessions : ${sessions.total}`);
-
-  const activities = db.prepare("SELECT count(*) as total FROM activities").get();
-  console.log(`Recorded Activities   : ${activities.total}`);
-} catch (err) {
-  console.error("Error reading database:", err.message);
+  if (allHealthy) {
+    console.log("\nResult        : 100% CONNECTED TO SUPABASE CLOUD DATABASE");
+  } else {
+    console.log("\nResult        : SUPABASE NEEDS ATTENTION (See table errors above)");
+  }
+  console.log("==========================================\n");
+  return allHealthy;
 }
-console.log("==========================================\n");
+
+await checkSupabase();
+
+if (fs.existsSync(dbPath)) {
+  const stats = fs.statSync(dbPath);
+  const db = new DatabaseSync(dbPath);
+  console.log("Local SQLite Fallback File:", dbPath, `(${(stats.size / 1024).toFixed(2)} KB)`);
+  try {
+    const totalStudents = db.prepare("SELECT count(*) as total FROM students").get();
+    const totalItems = db.prepare("SELECT count(*) as total FROM study_items").get();
+    console.log(`Local Fallback Rows       : ${totalStudents.total} students, ${totalItems.total} study items\n`);
+  } catch (_err) {
+    // Ignore empty fallback DB
+  }
+}
 
